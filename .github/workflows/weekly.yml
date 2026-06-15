@@ -2,8 +2,12 @@ name: Réia Weekly Competitor Intel
 
 on:
   schedule:
-    - cron: '0 6 */5 * *'        # ~every 5 days at 06:00 UTC
-  workflow_dispatch: {}           # manual "Run workflow" button
+    - cron: '0 6 */5 * *'        # ~every 5 days at 06:00 UTC (automatic, no password needed)
+  workflow_dispatch:              # manual "Run workflow" button — requires the passphrase below
+    inputs:
+      passphrase:
+        description: 'Run passphrase (must match the RUN_PASSPHRASE secret). Manual runs cost Apify money.'
+        required: true
   push:
     branches: [ main ]
     paths:
@@ -24,6 +28,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Password gate (manual runs only — fails before any Apify spend)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GIVEN: ${{ github.event.inputs.passphrase }}
+          EXPECTED: ${{ secrets.RUN_PASSPHRASE }}
+        run: |
+          if [ -z "$EXPECTED" ]; then echo "::error::No RUN_PASSPHRASE secret set. Add it in Settings -> Secrets and variables -> Actions."; exit 1; fi
+          if [ "$GIVEN" != "$EXPECTED" ]; then echo "::error::Wrong passphrase — aborting before any scrape, no cost incurred."; exit 1; fi
+          echo "Passphrase accepted."
+
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
