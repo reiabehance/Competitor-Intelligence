@@ -4,7 +4,7 @@ from datetime import date
 from collections import defaultdict, Counter
 import os
 BASE=os.environ.get("REPO_ROOT", os.path.dirname(os.path.abspath(__file__)))
-today=date(2026,6,13)
+today=date.today()
 MIN_ADS=4
 
 def days(s):
@@ -101,7 +101,21 @@ SEG={ # canonical -> (group, tagclass, tagtext)  groups: 0 self, 1 DIRECT compet
  # India lab-grown DIRECT (added but no active ads captured this cycle — placeholders if they surface)
  "Tridia":(1,"rival","DIRECT · lab-grown"),"Avira":(1,"rival","DIRECT · lab-grown"),"Solitario":(1,"rival","DIRECT · lab-grown"),
 }
+# ---- CONFIG-DRIVEN brand map: page_urls.json is the single place to add/manage competitors ----
+SEGMAP={"self":(0,"self","YOUR BRAND"),"direct":(1,"rival","DIRECT competitor"),
+        "adjacent":(2,"natural","ADJACENT jewellery"),"inspiration":(3,"d2c","INSPIRATION only — not a competitor")}
+PAGEMAP={}   # page_id -> {brand,group,tag,tagtext,country}
+try:
+    _cfg=json.load(open(os.path.join(BASE,"page_urls.json"),encoding="utf-8"))
+    for _p in _cfg.get("pages",[]):
+        _g=SEGMAP.get((_p.get("seg") or "inspiration").lower(),SEGMAP["inspiration"])
+        PAGEMAP[str(_p["page_id"])]={"brand":_p["brand"],"group":_g[0],"tag":_g[1],"tagtext":_g[2],"country":_p.get("country","ALL")}
+except Exception as _e:
+    print("page_urls.json not loaded (fallback to hardcoded SEG):",_e)
+BRANDINFO={}  # canonical brand -> {group,tag,tagtext,page_id,country}; filled while reading rows
 def seg(b):
+    if b in BRANDINFO:
+        i=BRANDINFO[b]; return (i["group"],i["tag"],i["tagtext"])
     return SEG.get(b,(3,"d2c","INSPIRATION only — not a competitor"))
 
 def category(copy, title, fmt):
@@ -126,42 +140,37 @@ def category(copy, title, fmt):
     return "Product / Catalogue"
 
 bylink={}
-# run15 + run16 are the authoritative uncapped page-scoped scrapes — for any brand they cover,
-# IGNORE older capped/keyword rows so stale + duplicate + partial data is fully replaced.
-AUTH=["run15_complete_2026-06-13.csv","run16_missing_2026-06-13.csv"]
-auth_brands=set()
-for _a in AUTH:
-    _p=BASE+"/data/raw/"+_a
-    if os.path.exists(_p):
-        for r in csv.DictReader(open(_p,encoding="utf-8")):
-            _b=canon(r.get("page_name",""))
-            if _b: auth_brands.add(_b)
 for rf in sorted(glob.glob(BASE+"/data/raw/*.csv")):
-    is_auth=any(rf.endswith(a) for a in AUTH)
     try:
         for r in csv.DictReader(open(rf,encoding="utf-8")):
             link=r.get("ad_library_url","")
             if not link: continue
-            b=canon(r.get("page_name",""))
-            if not b: continue
-            if (not is_auth) and (b in auth_brands): continue  # run15/16 authoritative for their brands
+            pid=str(r.get("page_id","") or "").strip()
+            if pid and pid in PAGEMAP:                 # tracked brand (config-driven, by page id)
+                info=PAGEMAP[pid]; b=info["brand"]
+                BRANDINFO[b]={"group":info["group"],"tag":info["tag"],"tagtext":info["tagtext"],"page_id":pid,"country":info["country"]}
+            elif pid:                                   # an ad from a page we don't track (collab / branded content) -> skip
+                continue
+            else:                                       # legacy CSV with no page_id column -> fall back to name matching
+                b=canon(r.get("page_name",""))
+                if not b: continue
             copy=(r.get("body_text","") or "").strip()
             cur=bylink.get(link)
             if cur and len(cur["copy"])>=len(copy): continue
             bylink[link]={"brand":b,"fmt":(r.get("display_format","") or ""),"title":(r.get("title","") or ""),
-                "copy":copy,"start":(r.get("start_date","") or "")[:10],"link":link}
+                "copy":copy,"start":(r.get("start_date","") or "")[:10],"link":link,"hasvid":(r.get("has_video","") or "")}
     except Exception as e:
         print("skip",rf,e)
 rows=list(bylink.values())
 for x in rows:
     dd=days(x["start"]); x["dd"]=dd
-    x["media"]="Reel" if x["fmt"]=="VIDEO" else "Static"
+    x["media"]="Reel" if (x.get("hasvid")=="1" or x["fmt"]=="VIDEO") else "Static"
     x["status"]=("Winning" if dd>=14 else "Losing" if dd>=7 else "Newly") if dd is not None else "?"
     x["cat"]=category(x["copy"],x["title"],x["fmt"])
 
-# brand totals, keep >=MIN_ADS
+# brand totals, keep >=MIN_ADS OR any tracked brand (in page_urls.json / hardcoded)
 bc=Counter(x["brand"] for x in rows if x["status"]!="?")
-known=set(SEG.keys())|set(disp for _,disp in NORM)
+known=set(BRANDINFO.keys())|set(SEG.keys())|set(disp for _,disp in NORM)
 keep=[b for b,n in bc.items() if n>=MIN_ADS or b in known]
 KEYS=["WR","WS","LR","LS","NR","NS"]
 KM={("Winning","Reel"):"WR",("Winning","Static"):"WS",("Losing","Reel"):"LR",("Losing","Static"):"LS",("Newly","Reel"):"NR",("Newly","Static"):"NS"}
@@ -177,7 +186,8 @@ for b in order:
     v=buckets[b]
     brk[b]={k:[{"cat":a["cat"],"dd":a["dd"],"fmt":a["fmt"],"copy":(a["title"] or a["copy"])[:150],"link":a["link"]}
               for a in sorted(v[k],key=lambda a:-(a["dd"] if a["dd"] is not None else 0))] for k in KEYS}
-    g,tc,tt=seg(b); meta[b]={"group":g,"tag":tc,"tagtext":tt,"total":bc[b]}
+    g,tc,tt=seg(b); _bi=BRANDINFO.get(b,{})
+    meta[b]={"group":g,"tag":tc,"tagtext":tt,"total":bc[b],"page_id":_bi.get("page_id",""),"country":_bi.get("country","ALL")}
     winners=v["WR"]+v["WS"]
     if winners:
         topcat=Counter(a["cat"] for a in winners).most_common(1)[0][0]
@@ -191,7 +201,54 @@ sN=sum(1 for x in rows if x["status"]=="Newly" and x["brand"] in keep)
 uniq=sum(bc[b] for b in keep)
 json.dump({"unique":uniq,"winning":sW,"losing":sL,"newly":sN,"brands":len(keep)}, open(BASE+"/data/assets/stats6.json","w"))
 GN={0:"Réia",1:"Direct competitors",2:"Adjacent jewellery",3:"Inspiration only"}
-print("brands kept:",len(keep),"| unique ads:",uniq,"| W",sW,"L",sL,"N",sN)
-for g in range(4):
-    bs=[b for b in order if seg(b)[0]==g]
-    print(f"  [{GN[g]}] {len(bs)}: "+", ".join(f"{b}({bc[b]})" for b in bs))
+try:
+    print("brands kept:",len(keep),"| unique ads:",uniq,"| W",sW,"L",sL,"N",sN)
+    for _grp in range(4):
+        _bs=[b for b in order if seg(b)[0]==_grp]
+        print("  ["+GN[_grp]+"] "+str(len(_bs))+": "+", ".join(b+"("+str(bc[b])+")" for b in _bs))
+except Exception as _pe:
+    print("summary print skipped:", _pe)
+# --- end of classify.py ---  (padding below guards against editor/sync tail-truncation)
+# pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad
+# pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad
+# pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad pad
+# padding line 1 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 2 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 3 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 4 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 5 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 6 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 7 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 8 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 9 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 10 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 11 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 12 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 13 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 14 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 15 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 16 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 17 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 18 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 19 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 20 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 21 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 22 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 23 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 24 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 25 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 26 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 27 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 28 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 29 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 30 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 31 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 32 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 33 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 34 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 35 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 36 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 37 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 38 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 39 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 40 — guards the file tail against OneDrive sync truncation; safe to ignore

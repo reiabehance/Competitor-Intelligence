@@ -80,6 +80,9 @@ def thumb(a,big=False):
 GN={0:"Réia — your own ads",1:"Direct competitors",2:"Adjacent jewellery (category context)",3:"Creative inspiration — NOT competitors"}
 GSUB={0:"self-audit",1:"India + global lab-grown / custom-engagement brands — your real rivals",2:"natural &amp; gold incumbents — they chase jewellery/wedding spend, not lab-grown engagement",3:"non-jewellery D2C &amp; luxury — we borrow their creative MECHANICS only; NOT competitors"}
 def aid(b): return "c-"+re.sub(r'[^a-z0-9]','',b.lower())
+def adlib(b):
+    pid=str(meta.get(b,{}).get("page_id") or ""); c=meta.get(b,{}).get("country") or "ALL"
+    return f'https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country={c}&search_type=page&view_all_page_id={pid}' if pid else ""
 def bstats(b):
     v=brk[b]
     w=len(v["WR"])+len(v["WS"]); l=len(v["LR"])+len(v["LS"]); n=len(v["NR"])+len(v["NS"])
@@ -134,7 +137,8 @@ for b in order:
         rows.append(f'<tr class="seg"><td colspan="6"><span class="segname">{GN[g]}</span><span class="segmeta">{t["n"]} brands · {t["cre"]} creatives · {t["plc"]} live placements</span></td></tr>')
         lastg=g
     rk+=1; barw=int(100*s["tot"]/maxtot); rc=' reia' if b=="Réia (self)" else ''
-    rows.append(f'<tr class="{rc}"><td class="bcell"><span class="rk">{rk}</span><a class="brandlink" href="#{aid(b)}">{html.escape(b)}</a></td>'
+    _al=adlib(b); _alink=(f' <a class="metalink" href="{_al}" target="_blank" rel="noopener" title="Cross-check this brand on Meta Ad Library">↗ Meta</a>' if _al else '')
+    rows.append(f'<tr class="{rc}" data-brand="{html.escape(b.lower())}"><td class="bcell"><span class="rk">{rk}</span><a class="brandlink" href="#{aid(b)}">{html.escape(b)}</a>{_alink}</td>'
       f'<td class="volcell"><span class="volbar"><i style="width:{barw}%"></i></span><b class="vn">{s["tot"]}</b></td>'
       f'<td class="crecell"><b>{U[b]}</b></td>'
       f'<td class="mixcell">{mixbar(s)}<span class="mixn"><b class="wc">{s["w"]}</b> <b class="lc">{s["l"]}</b> <b class="nc">{s["n"]}</b></span></td>'
@@ -180,8 +184,9 @@ for b in order:
         +cap("Win-rate",f'{s["wr"]}%')+f'<span class="cap th">Top theme <b>{html.escape(s["top"])}</b></span>')
     if winners: head="What’s WINNING — by theme (with the Réia twist)"; blocks=catblocks(winners)
     else: head="No 2-week winners yet — current bets (newly launched)"; blocks=catblocks(newlies) if newlies else '<div class="empty">No active creatives captured.</div>'
-    sections.append(f'<section class="comp" id="{aid(b)}"><div class="comph"><h3>{html.escape(b)} {tagh}</h3>'
-      f'<div class="caps">{caps}</div><div class="insight">{html.escape(insight.get(b,""))}</div></div>'
+    _al=adlib(b); _albtn=(f'<a class="metabtn" href="{_al}" target="_blank" rel="noopener">↗ Verify on Meta Ad Library</a>' if _al else '')
+    sections.append(f'<section class="comp" id="{aid(b)}" data-brand="{html.escape(b.lower())}"><div class="comph"><h3>{html.escape(b)} {tagh}</h3>'
+      f'<div class="caps">{caps}</div>{_albtn}<div class="insight">{html.escape(insight.get(b,""))}</div></div>'
       f'<div class="winhead">{head}</div>{blocks}'
       f'{gallery(losers,"lose","◴ Losing / short-run (1–2 wks)") if winners else ""}'
       f'{gallery(newlies,"new","✦ Newly launched (<1 wk)") if winners else ""}</section>')
@@ -237,6 +242,14 @@ h2{font-family:'Cormorant Garamond',serif;font-size:1.95rem;color:var(--maroon);
 .sw{display:inline-block;width:11px;height:11px;border-radius:3px;}
 .mw,.sw.mw{background:var(--win);}.ml,.sw.ml{background:var(--lose);}.mn,.sw.mn{background:var(--new);}
 .matrixwrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 4px 18px rgba(0,0,0,.07);}
+.searchwrap{margin:6px 0 14px;display:flex;align-items:center;gap:12px;}
+#brandsearch{flex:1;max-width:520px;font-family:'Poppins',sans-serif;font-size:.9rem;padding:11px 16px;border:1px solid var(--line);border-radius:24px;background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.05);outline:none;}
+#brandsearch:focus{border-color:var(--maroon);box-shadow:0 0 0 3px rgba(123,0,23,.12);}
+#searchcount{font-family:'Poppins',sans-serif;font-size:.72rem;color:#8a7c6c;}
+.metalink{font-family:'Poppins',sans-serif;font-size:.6rem;font-weight:500;color:#2f4d7a;background:#eef2f8;border:1px solid #d8e0ee;border-radius:9px;padding:1px 7px;text-decoration:none;margin-left:8px;white-space:nowrap;}
+.metalink:hover{background:#2f4d7a;color:#fff;}
+.metabtn{display:inline-block;font-family:'Poppins',sans-serif;font-size:.66rem;font-weight:600;color:#fff;background:#2f4d7a;border-radius:20px;padding:6px 14px;text-decoration:none;margin:2px 0 8px;}
+.metabtn:hover{background:#23395c;}
 table.mx{border-collapse:separate;border-spacing:0;width:100%;font-size:.9rem;}
 table.mx thead th{position:sticky;top:50px;z-index:5;background:var(--maroon);color:#fff;font-family:'Poppins',sans-serif;font-weight:500;font-size:.66rem;letter-spacing:.04em;text-transform:uppercase;text-align:left;padding:11px 14px;}
 table.mx tbody td{padding:11px 14px;border-bottom:1px solid #efe7d9;vertical-align:middle;}
@@ -321,14 +334,56 @@ B.append(f'<div class="hero"><div class="k">Holistic creative breakdown · {stat
 B.append(f'<div class="statrow"><div class="stat"><div class="n">{stats["brands"]}</div><div class="l">Brands tracked</div></div><div class="stat"><div class="n">{stats["unique"]}</div><div class="l">Live placements</div></div><div class="stat s2"><div class="n">{stats["winning"]}</div><div class="l">Winning 2+wk</div></div><div class="stat s4"><div class="n">{stats["losing"]+stats["newly"]}</div><div class="l">Short-run + new</div></div></div>')
 B.append(vspanel)
 B.append('<h2 id="overview">Overview — every brand at a glance</h2>')
+B.append('<div class="searchwrap"><input id="brandsearch" type="search" placeholder="🔎  Search a competitor… (filters the table and the brand sections)" autocomplete="off"><span id="searchcount"></span></div>')
 B.append('<div class="note"><b>How to read this:</b> the <b>Live placements</b> bar shows raw ad volume; <b>Creatives</b> is the distinct-ad count after we collapse duplicates; the <b>Status mix</b> bar shows what share is Winning (2+ wks), Short-run (1–2 wks) or Newly (&lt;1 wk); <b>Win-rate</b> = % surviving 2+ weeks. Click any brand to jump to its creatives.</div>')
 B.append(matrix); B.append(gap)
-B.append('<h2>Brand-by-brand creative breakdown</h2><div class="note" style="border-left-color:var(--maroon)">Each thumbnail is one distinct creative — a <b>x N</b> badge means that creative is running as N separate placements. Click a thumbnail to open the live ad.</div>'+''.join(sections))
+B.append('<h2>Brand-by-brand creative breakdown</h2><div class="note" style="border-left-color:var(--maroon)">Each thumbnail is one distinct creative — a <b>x N</b> badge means that creative runs as N separate placements. Use the search box to jump to a brand; click <b>↗ Verify on Meta Ad Library</b> in any brand to cross-check against the live source.</div>'+''.join(sections))
 B.append(f'<h2 id="recos">20 Reel recommendations <span class="hsub">(persona + output)</span></h2><div class="rcgrid">{reels}</div>')
 B.append(f'<h2>20 Static recommendations <span class="hsub">(persona + output)</span></h2><div class="rcgrid">{stat}</div>')
 B.append(f'<h2>Personas</h2><table class="per"><tr><td><b>Persona</b></td><td><b>Who</b></td><td><b>Output target</b></td></tr>{personarows}</table>')
-B.append(f'<div class="foot">{stats["brands"]} brands · {stats["unique"]} live placements · 28 brands re-scraped uncapped (run15) · {len(IMG)} thumbnails. Identical creatives collapsed via Meta collation_id (x N badge). Thumbnails load from Meta CDN with no-referrer. EF/VVS floor applies to all Réia creative.</div></div>')
+B.append(f'<div class="foot">{stats["brands"]} brands · {stats["unique"]} live placements · {len(IMG)} thumbnails · creatives de-duplicated via Meta collation_id. Auto-published from GitHub. EF/VVS floor applies to all Réia creative.</div></div>')
 LAZY="<script>(function(){function go(){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var im=e.target;if(im.dataset.src){im.src=im.dataset.src;im.removeAttribute('data-src');im.addEventListener('load',function(){im.classList.add('ld');});im.addEventListener('error',function(){im.classList.add('ld');});}io.unobserve(im);}});},{rootMargin:'900px 0px'});document.querySelectorAll('img.lz[data-src]').forEach(function(im){io.observe(im);});}if('IntersectionObserver' in window){go();}else{document.querySelectorAll('img.lz[data-src]').forEach(function(im){im.src=im.dataset.src;im.classList.add('ld');});}window.addEventListener('beforeprint',function(){document.querySelectorAll('img.lz[data-src]').forEach(function(im){im.src=im.dataset.src;});});})();</script>"
-OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><meta name=referrer content=no-referrer><title>Reia Competitor Intelligence</title><style>"+CSS+"</style></head><body>"+''.join(B)+LAZY+"</body></html>"
+SEARCH="<script>(function(){var inp=document.getElementById('brandsearch');if(!inp)return;var cnt=document.getElementById('searchcount');function f(){var q=inp.value.trim().toLowerCase();var n=0;document.querySelectorAll('table.mx tbody tr[data-brand]').forEach(function(r){var hit=!q||r.getAttribute('data-brand').indexOf(q)>-1;r.style.display=hit?'':'none';if(hit)n++;});document.querySelectorAll('table.mx tbody tr.seg').forEach(function(s){s.style.display=q?'none':'';});document.querySelectorAll('section.comp[data-brand]').forEach(function(s){s.style.display=(!q||s.getAttribute('data-brand').indexOf(q)>-1)?'':'none';});document.querySelectorAll('.seghead').forEach(function(s){s.style.display=q?'none':'';});cnt.textContent=q?(n+' match'+(n==1?'':'es')):'';}inp.addEventListener('input',f);})();</script>"
+OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><meta name=referrer content=no-referrer><title>Reia Competitor Intelligence</title><style>"+CSS+"</style></head><body>"+''.join(B)+LAZY+SEARCH+"</body></html>"
 open(BASE+"/reports/Reia-Competitor-Creative-Breakdown.html","w",encoding="utf-8").write(OUT)
-print("WROTE",len(OUT),"chars ·",OUT.count('data-src='),"lazy imgs")
+print("WROTE", len(OUT), "chars")
+# padding line 1 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 2 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 3 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 4 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 5 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 6 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 7 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 8 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 9 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 10 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 11 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 12 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 13 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 14 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 15 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 16 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 17 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 18 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 19 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 20 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 21 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 22 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 23 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 24 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 25 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 26 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 27 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 28 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 29 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 30 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 31 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 32 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 33 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 34 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 35 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 36 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 37 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 38 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 39 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding line 40 — guards the file tail against OneDrive sync truncation; safe to ignore
