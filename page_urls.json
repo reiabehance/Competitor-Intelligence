@@ -1,0 +1,362 @@
+{
+  "note": "All brand Facebook page IDs for the weekly page-scoped scrape. Build URLs via url_template (substitute COUNTRY + PAGE_ID). Run limitPerSource 200, activeStatus=active, sortBy=impressions_desc. Actor returns collation_id — dedupe creatives by it.",
+  "url_template": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country={COUNTRY}&search_type=page&sort_data[direction]=desc&sort_data[mode]=total_impressions&view_all_page_id={PAGE_ID}",
+  "email_recipients": [
+    "Prapanjj@reia.diamonds",
+    "Jacob@reia.diamonds",
+    "Ashwanth@reia.diamonds",
+    "dishababel57@gmail.com",
+    "modivasavi@gmail.com"
+  ],
+  "pages": [
+    {
+      "brand": "Réia (self)",
+      "seg": "self",
+      "country": "IN",
+      "page_id": "101541926236919"
+    },
+    {
+      "brand": "Onya",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "517692234762620"
+    },
+    {
+      "brand": "Aukera",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "108445295688784"
+    },
+    {
+      "brand": "Wondr",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "107624991025088"
+    },
+    {
+      "brand": "House of Quadri",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "116763084369020"
+    },
+    {
+      "brand": "Truecarat",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "126969443841975"
+    },
+    {
+      "brand": "BEYON (Titan)",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "890326130836305"
+    },
+    {
+      "brand": "Jewelbox",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "101266742327321"
+    },
+    {
+      "brand": "Fiona",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "126662094038800"
+    },
+    {
+      "brand": "Limelight",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "385167788707269"
+    },
+    {
+      "brand": "GIVA",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "350941852220221"
+    },
+    {
+      "brand": "Avira",
+      "seg": "direct",
+      "country": "IN",
+      "page_id": "461310007065936"
+    },
+    {
+      "brand": "Brilliant Earth",
+      "seg": "direct",
+      "country": "US",
+      "page_id": "13698310553"
+    },
+    {
+      "brand": "Blue Nile",
+      "seg": "direct",
+      "country": "US",
+      "page_id": "5873063513"
+    },
+    {
+      "brand": "Cullen",
+      "seg": "direct",
+      "country": "AU",
+      "page_id": "2174655312793851"
+    },
+    {
+      "brand": "Kalyan",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "120789801345974"
+    },
+    {
+      "brand": "Malabar",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "122298767852952"
+    },
+    {
+      "brand": "Joyalukkas",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "208006332548372"
+    },
+    {
+      "brand": "CaratLane",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "77179773544"
+    },
+    {
+      "brand": "BlueStone",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "158294897592584"
+    },
+    {
+      "brand": "Mookuthi",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "1353304584689970"
+    },
+    {
+      "brand": "Candere",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "671337662931060"
+    },
+    {
+      "brand": "Zoya",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "337769259667443"
+    },
+    {
+      "brand": "Tyaani",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "1678103539120309"
+    },
+    {
+      "brand": "Mia by Tanishq",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "1102247679847269"
+    },
+    {
+      "brand": "Tanishq",
+      "seg": "adjacent",
+      "country": "IN",
+      "page_id": "124839200878152"
+    },
+    {
+      "brand": "Sabyasachi",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "172689552749420"
+    },
+    {
+      "brand": "Raw Mango",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "243288549107418"
+    },
+    {
+      "brand": "Behno",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "461960733987428"
+    },
+    {
+      "brand": "Gucci",
+      "seg": "inspiration",
+      "country": "FR",
+      "page_id": "44596321012"
+    },
+    {
+      "brand": "Birkenstock",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "101881497948156"
+    },
+    {
+      "brand": "Levi's",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "267404810097600"
+    },
+    {
+      "brand": "Kay by Katrina (beauty)",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "100315158061269"
+    },
+    {
+      "brand": "Suta",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "1426400467586773"
+    },
+    {
+      "brand": "Bombay Shaving",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "1737772143174400"
+    },
+    {
+      "brand": "Bombae",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "108201058698913"
+    },
+    {
+      "brand": "Moxie Beauty",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "111562321939314"
+    },
+    {
+      "brand": "Cult.fit",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "392046674300717"
+    },
+    {
+      "brand": "Gully Labs",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "107479854297817"
+    },
+    {
+      "brand": "Fizzy Goblet",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "167895443227545"
+    },
+    {
+      "brand": "William Penn",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "110778675666477"
+    },
+    {
+      "brand": "Pant Project",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "107883774387445"
+    },
+    {
+      "brand": "Nappa Dori",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "172394862794020"
+    },
+    {
+      "brand": "Charles & Keith",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "361098457383438"
+    },
+    {
+      "brand": "Amit Aggarwal",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "106304981247757"
+    },
+    {
+      "brand": "Anita Dongre",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "80633620412"
+    },
+    {
+      "brand": "Shantnu & Nikhil",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "101241958152280"
+    },
+    {
+      "brand": "Jaipur Watch Co",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "335903486514788"
+    },
+    {
+      "brand": "Hidesign",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "118389642863"
+    },
+    {
+      "brand": "Gaurav Gupta",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "209945362405121"
+    },
+    {
+      "brand": "The Sleep Company",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "324603558250502"
+    },
+    {
+      "brand": "Cartier",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "203621737645"
+    },
+    {
+      "brand": "Forest Essentials",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "122921587768955"
+    },
+    {
+      "brand": "Nike",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "15087023444"
+    },
+    {
+      "brand": "GO DESi",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "117547272221199"
+    },
+    {
+      "brand": "Frido",
+      "seg": "inspiration",
+      "country": "IN",
+      "page_id": "1826621550927153"
+    }
+  ],
+  "still_missing_page_ids": [
+    "Tridia",
+    "Solitario",
+    "Huda Beauty",
+    "Pome",
+    "James Allen",
+    "Modern Mangal",
+    "MAC",
+    "Armani",
+    "Converse"
+  ],
+  "live_url": "",
+  "live_url_note": "After first Netlify deploy, paste the hub URL here so the weekly task can verify the live link is fresh."
+}
