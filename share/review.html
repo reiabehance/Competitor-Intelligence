@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Réia — To Review</title>
+<script src="config.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@400;500;600&family=Lora&display=swap');
+:root{--maroon:#7B0017;--ink:#15150e;--line:#e6dccb;--gold:#b78b2e;--win:#3f8f4f;--lose:#c0392b;--paper:#f3ecdf;}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Lora',Georgia,serif;}
+.top{background:var(--maroon);color:#fff;padding:18px 26px;box-shadow:0 2px 12px rgba(0,0,0,.18);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.top .tt{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;}
+.top a{color:#ffd9a8;font-family:'Poppins',sans-serif;font-size:.78rem;text-decoration:none;margin-left:14px;}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 20px 90px;}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 16px;font-family:'Poppins',sans-serif;font-size:.72rem;}
+.chip{background:#faf4ea;border:1px solid var(--line);border-radius:18px;padding:6px 13px;cursor:pointer;color:#6b5f54;}
+.chip.on{background:var(--maroon);color:#fff;border-color:var(--maroon);}
+.who{margin-left:auto;color:#8a7c6c;}.who b{color:var(--maroon);}
+.muted{color:#8a7c6c;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);display:flex;flex-direction:column;}
+.card.todo{outline:2px solid var(--gold);outline-offset:-2px;animation:reiapulse 1.7s ease-in-out infinite;}
+@keyframes reiapulse{0%,100%{box-shadow:0 0 0 0 rgba(183,139,46,.55);}50%{box-shadow:0 0 0 6px rgba(183,139,46,0);}}
+.ph{position:relative;background:#efe7d8;aspect-ratio:1/1;}
+.ph img{width:100%;height:100%;object-fit:cover;display:block;}
+.ph .noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#a89a88;font-family:'Poppins',sans-serif;font-size:.62rem;}
+.mb{position:absolute;top:7px;left:7px;font-family:'Poppins',sans-serif;font-size:.54rem;font-weight:700;padding:2px 7px;border-radius:8px;color:#fff;}
+.mb-r{background:#7B0017;}.mb-s{background:#2f4d7a;}
+.newtag{position:absolute;top:7px;right:7px;background:var(--gold);color:#1a1a12;font-family:'Poppins',sans-serif;font-size:.52rem;font-weight:700;padding:2px 7px;border-radius:8px;}
+.bd{padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex:1;}
+.bd .br{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--maroon);line-height:1.1;}
+.bd .ct{font-family:'Poppins',sans-serif;font-size:.62rem;color:#7a6a60;}
+.bd .vl{font-family:'Poppins',sans-serif;font-size:.64rem;color:#2f4d7a;text-decoration:none;}
+.acts{display:flex;gap:6px;margin-top:auto;padding-top:6px;}
+.acts button{flex:1;font-family:'Poppins',sans-serif;font-size:.62rem;font-weight:600;border:1px solid var(--line);border-radius:16px;padding:6px 4px;cursor:pointer;background:#faf4ea;color:var(--ink);}
+.acts .ok{color:var(--win);}.acts .no{color:var(--lose);}.acts .sl{color:var(--gold);}
+.acts button.act{color:#fff;}.acts .ok.act{background:var(--win);border-color:var(--win);}.acts .no.act{background:var(--lose);border-color:var(--lose);}.acts .sl.act{background:var(--gold);border-color:var(--gold);}
+.stat{font-family:'Poppins',sans-serif;font-size:.58rem;color:#8a7c6c;min-height:13px;}
+.empty{text-align:center;color:#8a7c6c;font-family:'Poppins',sans-serif;padding:50px 10px;grid-column:1/-1;}
+.setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
+</style></head><body>
+<div class="top"><div class="tt">RÉIA — To Review</div><div><a href="index.html">← Archive hub</a><a href="shortlist.html">★ Finalised & replication</a><a href="worklist.html">🎨 Designer worklist</a></div></div>
+<div class="wrap">
+<div class="bar">
+  <span class="chip on" data-f="todo">Needs review</span>
+  <span class="chip" data-f="considered">Considered ✓</span>
+  <span class="chip" data-f="passed">Passed ✕</span>
+  <span class="chip" data-f="all">All</span>
+  <span class="chip" data-f="reel">Reels</span>
+  <span class="chip" data-f="static">Statics</span>
+  <span class="who" id="who"></span>
+</div>
+<div id="count" class="muted" style="font-family:'Poppins',sans-serif;font-size:.7rem;margin-bottom:10px;"></div>
+<div id="list" class="grid"></div>
+</div>
+<script>
+var BACKEND=(window.REIA_BACKEND||"").trim();
+var NK="reiaReviewer";
+var FILTER="todo", ITEMS=[], REV={}, SHORT={};
+function esc(s){return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function isReel(x){return (x.media||"").toLowerCase().indexOf("reel")>-1;}
+function who(){var n=localStorage.getItem(NK);if(!n){n=prompt("Your name (so the team sees who reviewed it, e.g. Jacob):")||"";if(n){localStorage.setItem(NK,n);}}return n;}
+function showWho(){var n=localStorage.getItem(NK);document.getElementById("who").innerHTML=n?("reviewing as <b>"+esc(n)+"</b> · <span style='cursor:pointer;text-decoration:underline' onclick=\"localStorage.removeItem('reiaReviewer');location.reload();\">change</span>"):"";}
+function status(ck){var r=REV[ck];return r&&(r.status||r.considered)||"";}
+function norm(s){return (s==="yes")?"considered":((s==="no")?"passed":s);}
+function post(o){if(!BACKEND)return;fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)});}
+function fetchState(cb){
+  if(!BACKEND){REV={};SHORT={};cb&&cb();return;}
+  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){REV=(j&&j.reviews)||{};SHORT=(j&&j.shortlist)||{};cb&&cb();}).catch(function(){cb&&cb();});
+}
+function render(){
+  var L=document.getElementById("list");
+  if(!ITEMS.length){L.innerHTML='<div class="setup"><b>No creatives file yet.</b><br>This tab fills automatically after the next scheduled run publishes <code>creatives.json</code>. Until then, review on the breakdown.</div>';return;}
+  var items=ITEMS.filter(function(x){
+    var st=norm(status(x.ckey));
+    if(FILTER==="todo")return x.new && st==="";
+    if(FILTER==="considered")return st==="considered";
+    if(FILTER==="passed")return st==="passed";
+    if(FILTER==="reel")return isReel(x);
+    if(FILTER==="static")return !isReel(x);
+    return true;
+  });
+  var todo=ITEMS.filter(function(x){return x.new && norm(status(x.ckey))==="";}).length;
+  document.getElementById("count").innerHTML=(todo? ('<b style="color:#7B0017">'+todo+' new creative'+(todo==1?'':'s')+' awaiting a conscious review</b> · '):'')+items.length+" shown"+(BACKEND?"":' · <span style="color:#b78b2e">shared backend not connected — actions are local only until config/page_urls.json → backend_url is set</span>');
+  if(!items.length){L.innerHTML='<div class="empty">Nothing here'+(FILTER==="todo"?" — every new creative has been reviewed. ✓":" in this filter.")+'</div>';return;}
+  L.innerHTML=items.map(function(x){
+    var st=norm(status(x.ckey)), r=REV[x.ckey]||{}, sl=!!SHORT[x.ckey];
+    var todo=(x.new && st==="");
+    var img=x.img?('<img src="'+esc(x.img)+'" referrerpolicy="no-referrer" loading="lazy">'):'<div class="noimg">no preview</div>';
+    var by=(r.by?("by "+esc(r.by)+(r.at?(" · "+esc(r.at)):"")):"");
+    return '<div class="card'+(todo?' todo':'')+'" data-k="'+esc(x.ckey)+'">'+
+      '<div class="ph">'+img+(isReel(x)?'<span class="mb mb-r">REEL</span>':'<span class="mb mb-s">STATIC</span>')+(x.new?'<span class="newtag">NEW</span>':'')+'</div>'+
+      '<div class="bd"><div class="br">'+esc(x.brand)+'</div><div class="ct">'+esc(x.cat)+'</div>'+
+      '<a class="vl" href="'+esc(x.link)+'" target="_blank" rel="noopener">view live ad ↗</a>'+
+      '<div class="acts"><button class="ok'+(st==="considered"?" act":"")+'" data-a="considered">Consider ✓</button>'+
+      '<button class="no'+(st==="passed"?" act":"")+'" data-a="passed">Pass ✕</button>'+
+      '<button class="sl'+(sl?" act":"")+'" data-a="shortlist">★</button></div>'+
+      '<div class="stat">'+(st?(st==="considered"?"Considered for Réia "+by:"Reviewed & passed "+by):"awaiting review")+'</div></div></div>';
+  }).join("");
+  L.querySelectorAll(".card").forEach(function(c){
+    var ck=c.getAttribute("data-k"), x=ITEMS.filter(function(i){return i.ckey===ck;})[0];
+    c.querySelectorAll(".acts button").forEach(function(b){
+      b.addEventListener("click",function(){
+        var a=b.getAttribute("data-a"), nm=who();
+        if(a==="shortlist"){
+          if(SHORT[ck]){delete SHORT[ck];post({kind:"shortlist",ckey:ck,remove:true});}
+          else{SHORT[ck]={kind:"shortlist",ckey:ck,brand:x.brand,media:x.media,cat:x.cat,link:x.link,img:x.img,reason:"",replicated:"no",usage:"",by:nm};post(SHORT[ck]);}
+        }else{
+          var cur=norm(status(ck));var nxt=(cur===a)?"":a;
+          if(nxt===""){delete REV[ck];post({kind:"review",ckey:ck,remove:true});}
+          else{REV[ck]={kind:"review",ckey:ck,brand:x.brand,media:x.media,cat:x.cat,link:x.link,img:x.img,status:nxt,by:nm,at:new Date().toISOString().slice(0,10)};post(REV[ck]);}
+        }
+        render();
+      });
+    });
+  });
+}
+document.querySelectorAll(".chip").forEach(function(c){c.addEventListener("click",function(){document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});c.classList.add("on");FILTER=c.getAttribute("data-f");render();});});
+function boot(){showWho();fetch("creatives.json",{cache:"no-store"}).then(function(r){return r.json();}).then(function(a){ITEMS=a||[];fetchState(render);}).catch(function(){ITEMS=[];render();});}
+boot();
+setInterval(function(){fetchState(render);},30000);
+</script>
+</body></html>
+<!-- tail-guard 1 (after </html>, truncation here is harmless) -->
+<!-- tail-guard 2 (after </html>, truncation here is harmless) -->
+<!-- tail-guard 3 (after </html>, truncation here is harmless) -->
+<!-- tail-guard 4 (after </html>, truncation here is harmless) -->
+<!-- tail-guard 5 (after </html>, truncation here is harmless) -->
+<!-- tail-guard 6 (after </html>, truncation here is harmless) -->
+<!-- tail-guard 7 (after </html>, truncation here is harmless) -->
+<!-- tail-guard 8 (after </html>, truncation here is harmless) -->
