@@ -1,0 +1,190 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Réia — Replication Board</title>
+<script src="config.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@400;500;600&family=Lora&display=swap');
+:root{--maroon:#7B0017;--ink:#15150e;--line:#e6dccb;--gold:#b78b2e;--paper:#f3ecdf;
+--done:#3f8f4f;--work:#b78b2e;--todo:#9a8f80;--block:#c0392b;
+--urgent:#c0392b;--high:#d77a2b;--normal:#6b7a8f;--low:#9aa7b0;}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Lora',Georgia,serif;}
+.top{background:var(--maroon);color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.top .tt{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;}
+.top a{color:#ffd9a8;font-family:'Poppins',sans-serif;font-size:.76rem;text-decoration:none;margin-left:13px;}
+.wrap{max-width:1320px;margin:0 auto;padding:18px 18px 80px;}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 14px;font-family:'Poppins',sans-serif;}
+.kpi{flex:1;min-width:130px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;border-left:5px solid var(--todo);}
+.kpi.done{border-left-color:var(--done);}.kpi.work{border-left-color:var(--work);}.kpi.todo{border-left-color:var(--todo);}.kpi.block{border-left-color:var(--block);}.kpi.tot{border-left-color:var(--maroon);}
+.kpi .n{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;line-height:1;color:var(--ink);}
+.kpi .l{font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:#8a7c6c;margin-top:4px;}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 14px;font-family:'Poppins',sans-serif;font-size:.72rem;}
+.seg{display:flex;border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+.seg button{border:none;background:#faf4ea;color:#6b5f54;font-family:'Poppins',sans-serif;font-size:.72rem;font-weight:600;padding:7px 15px;cursor:pointer;}
+.seg button.on{background:var(--maroon);color:#fff;}
+.flt{background:#faf4ea;border:1px solid var(--line);border-radius:16px;padding:6px 11px;font-family:'Poppins',sans-serif;font-size:.7rem;color:var(--ink);}
+.btnlite{background:#fff;border:1px solid var(--line);border-radius:16px;padding:6px 12px;font-family:'Poppins',sans-serif;font-size:.7rem;font-weight:600;color:var(--maroon);cursor:pointer;}
+.grp{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;color:var(--maroon);border-bottom:2px solid #e6cf9a;padding:14px 0 5px;margin-top:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.grp .gn{font-family:'Poppins',sans-serif;font-size:.58rem;font-weight:600;color:#fff;background:var(--gold);border-radius:10px;padding:1px 8px;}
+.grp .mini{font-family:'Poppins',sans-serif;font-size:.6rem;font-weight:500;color:#8a7c6c;}
+.row{display:grid;grid-template-columns:54px 1.6fr 1fr 1fr 1fr 1fr;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin:7px 0;}
+@media(max-width:860px){.row{grid-template-columns:54px 1fr 1fr;}}
+.row img{width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--line);}
+.row .noimg{width:54px;height:54px;border-radius:8px;border:1px dashed var(--line);}
+.cell .lab{font-size:.54rem;text-transform:uppercase;letter-spacing:.05em;color:#9a8c7c;font-family:'Poppins',sans-serif;margin-bottom:2px;}
+.brand{font-family:'Cormorant Garamond',serif;font-size:1.12rem;font-weight:700;color:var(--maroon);}
+.sub{font-family:'Poppins',sans-serif;font-size:.62rem;color:#7a6a60;}
+.mb{font-size:.5rem;font-weight:700;padding:1px 6px;border-radius:7px;color:#fff;}.mb-r{background:#7B0017;}.mb-s{background:#2f4d7a;}
+select.f{width:100%;font-family:'Poppins',sans-serif;font-size:.72rem;border:1px solid var(--line);border-radius:8px;padding:5px 7px;background:#fffdf8;color:var(--ink);}
+.pill{display:inline-block;font-family:'Poppins',sans-serif;font-size:.56rem;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;}
+.st-done{background:var(--done);}.st-work{background:var(--work);}.st-todo{background:var(--todo);}.st-block{background:var(--block);}
+.pr-urgent{background:var(--urgent);}.pr-high{background:var(--high);}.pr-normal{background:var(--normal);}.pr-low{background:var(--low);}
+.links a{font-family:'Poppins',sans-serif;font-size:.62rem;color:#2f4d7a;text-decoration:none;display:block;}
+.empty{text-align:center;color:#8a7c6c;font-family:'Poppins',sans-serif;padding:50px 10px;}
+.setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
+.modal{position:fixed;inset:0;background:rgba(21,21,14,.45);display:none;align-items:center;justify-content:center;z-index:50;}
+.modal.on{display:flex;}
+.card{background:#fff;border-radius:14px;padding:20px 22px;max-width:420px;width:92%;box-shadow:0 12px 40px rgba(0,0,0,.3);font-family:'Poppins',sans-serif;}
+.card h3{font-family:'Cormorant Garamond',serif;color:var(--maroon);margin:0 0 10px;font-size:1.3rem;}
+.card .plist{display:flex;flex-direction:column;gap:6px;margin:10px 0;max-height:240px;overflow:auto;}
+.card .prow{display:flex;align-items:center;gap:8px;font-size:.8rem;}
+.card .prow .x{margin-left:auto;color:#c0392b;cursor:pointer;font-weight:700;}
+.card .adm{font-size:.54rem;font-weight:700;color:#fff;background:var(--gold);border-radius:8px;padding:1px 6px;}
+.card input{font-family:'Poppins',sans-serif;font-size:.82rem;border:1px solid var(--line);border-radius:8px;padding:7px 9px;}
+.card .btn{background:var(--maroon);color:#fff;border:none;border-radius:18px;padding:8px 16px;font-weight:600;cursor:pointer;font-size:.75rem;}
+.card .btn2{background:#faf4ea;color:var(--maroon);border:1px solid var(--line);border-radius:18px;padding:8px 16px;font-weight:600;cursor:pointer;font-size:.75rem;}
+.who{font-family:'Poppins',sans-serif;font-size:.66rem;color:#ffd9a8;}
+</style></head><body>
+<div class="top"><div class="tt">RÉIA — Replication Board</div>
+  <div><span class="who" id="who"></span>
+  <a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a>
+  <a href="#" id="mng" style="color:#fff">⚙ People</a></div>
+</div>
+<div class="wrap">
+<div id="kpis" class="kpis"></div>
+<div class="bar">
+  <span style="color:#8a7c6c;font-weight:600">View:</span>
+  <div class="seg" id="seg">
+    <button data-v="stage" class="on">By stage</button>
+    <button data-v="designer">By designer</button>
+    <button data-v="campaign">By campaign</button>
+  </div>
+  <select class="flt" id="fpr"><option value="all">All priorities</option><option>Urgent</option><option>High</option><option>Normal</option><option>Low</option></select>
+  <select class="flt" id="fdz"><option value="all">All designers</option></select>
+  <span id="count" style="margin-left:auto;color:#8a7c6c;"></span>
+</div>
+<div id="list"></div>
+</div>
+
+<div class="modal" id="pmodal"><div class="card">
+  <h3>Manage designers / people</h3>
+  <div style="font-size:.72rem;color:#8a7c6c">Only admins can add or remove. You're acting as <b id="pwho"></b>.</div>
+  <div class="plist" id="plist"></div>
+  <div style="display:flex;gap:6px;margin-top:8px"><input id="pname" placeholder="New name" style="flex:1"><label style="font-size:.7rem;display:flex;align-items:center;gap:4px"><input type="checkbox" id="padm">admin</label><button class="btn" id="padd">Add</button></div>
+  <div style="text-align:right;margin-top:12px"><button class="btn2" id="pclose">Close</button></div>
+</div></div>
+
+<script>
+var BACKEND=(window.REIA_BACKEND||"").trim();
+var VIEW="stage", FPR="all", FDZ="all", DATA={}, PEOPLE={};
+var STAGES=[["no","To replicate","st-todo"],["in-progress","Replicating","st-work"],["blocked","Blocked / not working","st-block"],["done","Replicated ✓","st-done"]];
+var PRIOS=["Urgent","High","Normal","Low"];
+function esc(s){return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function isReel(x){return (x.media||"").toLowerCase().indexOf("reel")>-1;}
+function nm(){var n=localStorage.getItem("reiaReviewer");if(!n){n=prompt("Your name (so the team sees who assigned/edited, e.g. Réia):")||"";if(n)localStorage.setItem("reiaReviewer",n);}return n;}
+function stageOf(x){var r=x.replicated||"no";return r;}
+function stageMeta(r){for(var i=0;i<STAGES.length;i++)if(STAGES[i][0]===r)return STAGES[i];return STAGES[0];}
+function prMeta(p){p=p||"Normal";return "pr-"+p.toLowerCase();}
+function campOf(x){return (x.campaign&&(""+x.campaign).trim())?(""+x.campaign).trim():"Unassigned";}
+function dzOf(x){return (x.designer&&(""+x.designer).trim())?(""+x.designer).trim():"Unassigned";}
+function post(o){if(!BACKEND)return Promise.resolve({});return fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)}).then(function(r){return r.json();}).catch(function(){return {};});}
+function load(){
+  if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Shared backend not connected.</b><br>Paste your Apps Script /exec URL into <code>page_urls.json → backend_url</code> and re-run.</div>';return;}
+  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};PEOPLE=(j&&j.people)||{};render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store.</div>';});
+}
+function designers(){return Object.keys(PEOPLE).sort();}
+function isAdmin(name){var p=PEOPLE[name];return !!(p&&(""+p.is_admin).toLowerCase()==="yes");}
+function items(){
+  var a=Object.keys(DATA).map(function(k){return DATA[k];});
+  if(FPR!=="all")a=a.filter(function(x){return (x.priority||"Normal")===FPR;});
+  if(FDZ!=="all")a=a.filter(function(x){return dzOf(x)===FDZ;});
+  return a;
+}
+function prRank(p){var i=PRIOS.indexOf(p||"Normal");return i<0?2:i;}
+function render(){
+  // KPIs
+  var all=Object.keys(DATA).map(function(k){return DATA[k];});
+  var c={no:0,"in-progress":0,blocked:0,done:0};
+  all.forEach(function(x){var r=stageOf(x);c[r]=(c[r]||0)+1;});
+  document.getElementById("kpis").innerHTML=
+    kpi("tot",all.length,"Finalised total")+kpi("todo",c.no||0,"To replicate")+kpi("work",c["in-progress"]||0,"Working")+kpi("block",c.blocked||0,"Not working")+kpi("done",c.done||0,"Completed");
+  // designer filter options
+  var fdz=document.getElementById("fdz");if(fdz.options.length<=1){designers().forEach(function(d){var o=document.createElement("option");o.textContent=d;fdz.appendChild(o);});var ou=document.createElement("option");ou.textContent="Unassigned";fdz.appendChild(ou);}
+  // group
+  var its=items();
+  document.getElementById("count").textContent=its.length+" shown";
+  var groups={};
+  its.forEach(function(x){
+    var key = VIEW==="stage"? stageMeta(stageOf(x))[1] : (VIEW==="designer"? dzOf(x) : campOf(x));
+    (groups[key]=groups[key]||[]).push(x);
+  });
+  var order=Object.keys(groups);
+  if(VIEW==="stage")order=STAGES.map(function(s){return s[1];}).filter(function(l){return groups[l];});
+  else order.sort(function(a,b){return a==="Unassigned"?1:(b==="Unassigned"?-1:a.localeCompare(b));});
+  var L=document.getElementById("list");
+  if(!its.length){L.innerHTML='<div class="empty">Nothing finalised yet, or nothing matches the filters. Shortlist creatives on the To-Review or breakdown tab.</div>';return;}
+  var html="";
+  order.forEach(function(g){
+    var arr=groups[g];arr.sort(function(p,q){return prRank(p.priority)-prRank(q.priority)||(p.brand||"").localeCompare(q.brand||"");});
+    html+='<div class="grp">'+esc(g)+' <span class="gn">'+arr.length+'</span></div>';
+    arr.forEach(function(x){ html+=rowHtml(x); });
+  });
+  L.innerHTML=html;
+  bind();
+}
+function kpi(cls,n,l){return '<div class="kpi '+cls+'"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
+function opt(v,sel){return '<option'+(v===sel?' selected':'')+'>'+esc(v)+'</option>';}
+function rowHtml(x){
+  var sm=stageMeta(stageOf(x));
+  var img=x.img?('<img src="'+esc(x.img)+'" referrerpolicy="no-referrer">'):'<div class="noimg"></div>';
+  var dz=designers().map(function(d){return '<option'+(dzOf(x)===d?' selected':'')+'>'+esc(d)+'</option>';}).join("");
+  var our=x.our_creative?('<a href="'+esc(x.our_creative)+'" target="_blank" rel="noopener">our asset ↗</a>'):'';
+  return '<div class="row" data-k="'+esc(x.ckey)+'">'+img+
+    '<div class="cell"><div class="brand">'+esc(x.brand)+' '+(isReel(x)?'<span class="mb mb-r">REEL</span>':'<span class="mb mb-s">STATIC</span>')+'</div>'+
+      '<div class="sub">'+esc(x.cat)+' · 🏷 '+esc(campOf(x))+'</div></div>'+
+    '<div class="cell"><div class="lab">Designer</div><select class="f sd"><option value="">— assign —</option>'+dz+'</select></div>'+
+    '<div class="cell"><div class="lab">Priority</div><select class="f sp">'+PRIOS.map(function(p){return opt(p,x.priority||"Normal");}).join("")+'</select></div>'+
+    '<div class="cell"><div class="lab">Stage</div><select class="f ss">'+STAGES.map(function(s){return '<option value="'+s[0]+'"'+(stageOf(x)===s[0]?' selected':'')+'>'+s[1]+'</option>';}).join("")+'</select></div>'+
+    '<div class="cell links"><span class="pill '+sm[2]+'">'+sm[1]+'</span> <span class="pill '+prMeta(x.priority)+'">'+esc(x.priority||"Normal")+'</span><a href="'+esc(x.link)+'" target="_blank" rel="noopener">original ↗</a>'+our+'</div>'+
+  '</div>';
+}
+function bind(){
+  document.querySelectorAll(".row").forEach(function(r){
+    var k=r.getAttribute("data-k"), x=DATA[k];
+    function save(){ x.kind="shortlist"; x.ckey=k; x.by=x.by||nm(); post(x).then(function(){render();}); }
+    r.querySelector(".sd").addEventListener("change",function(){x.designer=this.value;save();});
+    r.querySelector(".sp").addEventListener("change",function(){x.priority=this.value;save();});
+    r.querySelector(".ss").addEventListener("change",function(){x.replicated=this.value;save();});
+  });
+}
+// view + filters
+document.querySelectorAll("#seg button").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("#seg button").forEach(function(x){x.classList.remove("on");});b.classList.add("on");VIEW=b.getAttribute("data-v");render();});});
+document.getElementById("fpr").addEventListener("change",function(){FPR=this.value;render();});
+document.getElementById("fdz").addEventListener("change",function(){FDZ=this.value;render();});
+// people modal
+function renderPeople(){
+  var me=nm();document.getElementById("pwho").textContent=me+(isAdmin(me)?" (admin)":" (not admin)");
+  var pl=document.getElementById("plist");
+  pl.innerHTML=designers().map(function(d){return '<div class="prow" data-n="'+esc(d)+'"><span>'+esc(d)+'</span>'+(isAdmin(d)?'<span class="adm">admin</span>':'')+(isAdmin(me)?'<span class="x" title="remove">✕</span>':'')+'</div>';}).join("")||'<div style="color:#8a7c6c;font-size:.8rem">No people yet.</div>';
+  pl.querySelectorAll(".x").forEach(function(xx){xx.addEventListener("click",function(){var n=xx.parentNode.getAttribute("data-n");post({kind:"person",action:"remove",name:n,by:nm()}).then(function(j){if(j&&j.error){alert(j.error);}else if(j&&j.people){PEOPLE=j.people;renderPeople();render();}});});});
+}
+document.getElementById("mng").addEventListener("click",function(e){e.preventDefault();document.getElementById("pmodal").classList.add("on");renderPeople();});
+document.getElementById("pclose").addEventListener("click",function(){document.getElementById("pmodal").classList.remove("on");});
+document.getElementById("padd").addEventListener("click",function(){var n=document.getElementById("pname").value.trim();if(!n)return;post({kind:"person",action:"add",name:n,is_admin:document.getElementById("padm").checked,by:nm()}).then(function(j){if(j&&j.error){alert(j.error);}else if(j&&j.people){PEOPLE=j.people;document.getElementById("pname").value="";document.getElementById("padm").checked=false;renderPeople();render();}});});
+document.getElementById("who").textContent=localStorage.getItem("reiaReviewer")?("as "+localStorage.getItem("reiaReviewer")):"";
+load();
+</script>
+</body></html>
+<!-- tail-guard (after </html>) -->
+<!-- tail-guard (after </html>) -->
+<!-- tail-guard (after </html>) -->
+<!-- tail-guard (after </html>) -->

@@ -16,6 +16,8 @@ open(SHARE+"/config.js","w",encoding="utf-8").write('window.REIA_BACKEND="%s";'%
 if os.path.exists(BASE+"/shortlist.html"): shutil.copy(BASE+"/shortlist.html", SHARE+"/shortlist.html")
 if os.path.exists(BASE+"/review.html"): shutil.copy(BASE+"/review.html", SHARE+"/review.html")
 if os.path.exists(BASE+"/worklist.html"): shutil.copy(BASE+"/worklist.html", SHARE+"/worklist.html")
+if os.path.exists(BASE+"/board.html"): shutil.copy(BASE+"/board.html", SHARE+"/board.html")
+if os.path.exists(BASE+"/mywork.html"): shutil.copy(BASE+"/mywork.html", SHARE+"/mywork.html")
 if os.path.exists(BASE+"/data/assets/creatives.json"): shutil.copy(BASE+"/data/assets/creatives.json", SHARE+"/creatives.json")
 now=datetime.datetime.now()
 stamp=now.strftime("%Y-%m-%d_%H%M"); ym=now.strftime("%Y-%m"); nice=now.strftime("%d %b %Y, %H:%M")
@@ -80,10 +82,17 @@ def kpis(m):
             f'<span><b>{m["winning"]:,}</b>winning</span><span><b>{m["losing"]:,}</b>short-run</span><span><b>{m["newly"]:,}</b>newly</span></div>')
 B=[]
 B.append('<div class="top"><div class="ts">Weekly Competitor Creative Intelligence · version history</div><div class="tt">RÉIA — Competitor Intelligence Archive</div></div><div class="wrap">')
+B.append('<div style="background:#fff;border:1px solid #e6dccb;border-radius:14px;padding:12px 16px;margin:0 0 16px;font-family:\'Poppins\',sans-serif;font-size:.74rem;color:#6b5f54;line-height:1.7">'
+         '<b style="color:#7B0017;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase">How the team works, start to end</b><br>'
+         '<b>1.</b> Open the <b>breakdown</b> to scan competitor ads &nbsp;→&nbsp; <b>2.</b> On <a style="color:#7B0017" href="review.html">🔔 To review</a>, mark Consider/Pass; ★ a creative to send it to replication <i>with a brief</i> &nbsp;→&nbsp; '
+         '<b>3.</b> On the <a style="color:#7B0017" href="board.html">📊 Board</a>, assign designer + priority + stage &nbsp;→&nbsp; <b>4.</b> Each designer opens <a style="color:#7B0017" href="mywork.html">🧑‍🎨 My work</a> to build &amp; upload their version &nbsp;→&nbsp; '
+         '<b>5.</b> Record the <a style="color:#7B0017" href="shortlist.html">★ outcome &amp; learning</a>. The <a style="color:#7B0017" href="worklist.html">🎨 Worklist</a> exports it all.</div>')
 _lbrief=(f'<a class="btn" style="background:rgba(255,255,255,.16);color:#fff" href="versions/{latest["stamp"]}/decision-brief.html">Decision brief →</a>' if latest.get("has_brief") else '')
 B.append(f'<div class="latest"><div class="lab">Latest snapshot</div><h2>{html.escape(latest["nice"])}</h2>{kpis(latest)}'
          f'<div><a class="btn" href="versions/{latest["stamp"]}/index.html">Open the breakdown →</a> {_lbrief} '
          f'<a class="btn" style="background:#1f8a4c;color:#fff" href="review.html">🔔 To review →</a> '
+         f'<a class="btn" style="background:#2f4d7a;color:#fff" href="board.html">📊 Replication board →</a> '
+         f'<a class="btn" style="background:#5d3a7a;color:#fff" href="mywork.html">🧑‍🎨 My work →</a> '
          f'<a class="btn" style="background:#b78b2e;color:#1a1a12" href="shortlist.html">★ Finalised &amp; replication →</a> '
          f'<a class="btn" style="background:#2f4d7a;color:#fff" href="worklist.html">🎨 Designer worklist →</a></div></div>')
 for monthname,items in by.items():
@@ -94,13 +103,13 @@ for monthname,items in by.items():
         B.append(f'<div class="card"><div class="d">{html.escape(m["nice"])}</div>'
                  f'<div class="s"><i>{m["unique"]:,} placements</i><i>{m["brands"]} brands</i><i class="w">{m["winning"]:,} win</i><i class="l">{m["losing"]:,} short</i><i class="n">{m["newly"]:,} new</i></div>'
                  f'<div class="links"><a href="versions/{m["stamp"]}/index.html">Breakdown</a>{briefl}</div></div>')
+    B.append('</div>')
 B.append(f'<div class="foot">{len(man)} versions archived. Each snapshot is frozen at capture time; monthly folders hold the final state of each month. EF/VVS floor applies to all Reia creative.</div></div>')
 OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><title>Reia Competitor Intelligence Archive</title><style>"+CSS+"</style></head><body>"+''.join(B)+"</body></html>"
 open(SHARE+"/index.html","w",encoding="utf-8").write(OUT)
 print("HUB wrote",len(man),"versions; config.js backend=",("set" if _BU else "EMPTY"))
-# padding 1 — guards file tail against OneDrive sync truncation
-# padding 2 — guards file tail against OneDrive sync truncation
-# padding 3 — guards file tail against OneDrive sync truncation
-# padding 4 — guards file tail against OneDrive sync truncation
-# padding 5 — guards file tail against OneDrive sync truncation
-# padding 6 — guards file tail against OneDrive sync truncation
+# padding 1 — guards file tail
+# padding 2 — guards file tail
+# padding 3 — guards file tail
+# padding 4 — guards file tail
+# padding 5 — guards file tail

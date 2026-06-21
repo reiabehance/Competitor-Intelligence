@@ -1,16 +1,18 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="referrer" content="no-referrer">
-<title>Réia — To Review</title>
+<meta name="referrer" content="no-referrer"><title>Réia — To Review</title>
 <script src="config.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@400;500;600&family=Lora&display=swap');
 :root{--maroon:#7B0017;--ink:#15150e;--line:#e6dccb;--gold:#b78b2e;--win:#3f8f4f;--lose:#c0392b;--paper:#f3ecdf;}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Lora',Georgia,serif;}
-.top{background:var(--maroon);color:#fff;padding:18px 26px;box-shadow:0 2px 12px rgba(0,0,0,.18);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
-.top .tt{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;}
-.top a{color:#ffd9a8;font-family:'Poppins',sans-serif;font-size:.78rem;text-decoration:none;margin-left:14px;}
-.wrap{max-width:1240px;margin:0 auto;padding:22px 20px 90px;}
-.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 16px;font-family:'Poppins',sans-serif;font-size:.72rem;}
+.top{background:var(--maroon);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.top .tt{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:700;}
+.nav a{color:#ffd9a8;font-family:'Poppins',sans-serif;font-size:.74rem;text-decoration:none;margin-left:12px;}
+.nav a.here{color:#fff;border-bottom:2px solid var(--gold);padding-bottom:2px;}
+.flow{background:#efe4cf;font-family:'Poppins',sans-serif;font-size:.62rem;color:#6b5f54;text-align:center;padding:5px;letter-spacing:.03em;}
+.flow b{color:var(--maroon);}
+.wrap{max-width:1240px;margin:0 auto;padding:18px 20px 90px;}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 14px;font-family:'Poppins',sans-serif;font-size:.72rem;}
 .chip{background:#faf4ea;border:1px solid var(--line);border-radius:18px;padding:6px 13px;cursor:pointer;color:#6b5f54;}
 .chip.on{background:var(--maroon);color:#fff;border-color:var(--maroon);}
 .who{margin-left:auto;color:#8a7c6c;}.who b{color:var(--maroon);}
@@ -21,109 +23,159 @@
 @keyframes reiapulse{0%,100%{box-shadow:0 0 0 0 rgba(183,139,46,.55);}50%{box-shadow:0 0 0 6px rgba(183,139,46,0);}}
 .ph{position:relative;background:#efe7d8;aspect-ratio:1/1;}
 .ph img{width:100%;height:100%;object-fit:cover;display:block;}
-.ph .noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#a89a88;font-family:'Poppins',sans-serif;font-size:.62rem;}
+.ph .noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#a89a88;font-size:.62rem;font-family:'Poppins',sans-serif;}
 .mb{position:absolute;top:7px;left:7px;font-family:'Poppins',sans-serif;font-size:.54rem;font-weight:700;padding:2px 7px;border-radius:8px;color:#fff;}
 .mb-r{background:#7B0017;}.mb-s{background:#2f4d7a;}
-.newtag{position:absolute;top:7px;right:7px;background:var(--gold);color:#1a1a12;font-family:'Poppins',sans-serif;font-size:.52rem;font-weight:700;padding:2px 7px;border-radius:8px;}
+.star{position:absolute;top:6px;right:7px;font-size:1.1rem;color:#fff;cursor:pointer;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+.star.on{color:var(--gold);}
 .bd{padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex:1;}
 .bd .br{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--maroon);line-height:1.1;}
 .bd .ct{font-family:'Poppins',sans-serif;font-size:.62rem;color:#7a6a60;}
 .bd .vl{font-family:'Poppins',sans-serif;font-size:.64rem;color:#2f4d7a;text-decoration:none;}
 .acts{display:flex;gap:6px;margin-top:auto;padding-top:6px;}
 .acts button{flex:1;font-family:'Poppins',sans-serif;font-size:.62rem;font-weight:600;border:1px solid var(--line);border-radius:16px;padding:6px 4px;cursor:pointer;background:#faf4ea;color:var(--ink);}
-.acts .ok{color:var(--win);}.acts .no{color:var(--lose);}.acts .sl{color:var(--gold);}
-.acts button.act{color:#fff;}.acts .ok.act{background:var(--win);border-color:var(--win);}.acts .no.act{background:var(--lose);border-color:var(--lose);}.acts .sl.act{background:var(--gold);border-color:var(--gold);}
+.acts .ok{color:var(--win);}.acts .no{color:var(--lose);}
+.acts button.act{color:#fff;}.acts .ok.act{background:var(--win);border-color:var(--win);}.acts .no.act{background:var(--lose);border-color:var(--lose);}
 .stat{font-family:'Poppins',sans-serif;font-size:.58rem;color:#8a7c6c;min-height:13px;}
+.assigned{font-family:'Poppins',sans-serif;font-size:.56rem;color:#7B0017;background:#f6e9cf;border:1px solid #e6cf9a;border-radius:8px;padding:2px 6px;}
 .empty{text-align:center;color:#8a7c6c;font-family:'Poppins',sans-serif;padding:50px 10px;grid-column:1/-1;}
 .setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
+.modal{position:fixed;inset:0;background:rgba(21,21,14,.45);display:none;align-items:center;justify-content:center;z-index:60;}
+.modal.on{display:flex;}
+.mc{background:#fff;border-radius:14px;padding:20px 22px;max-width:440px;width:94%;box-shadow:0 12px 40px rgba(0,0,0,.3);font-family:'Poppins',sans-serif;}
+.mc h3{font-family:'Cormorant Garamond',serif;color:var(--maroon);margin:0 0 4px;font-size:1.35rem;}
+.mc .sb{font-size:.7rem;color:#8a7c6c;margin-bottom:10px;}
+.mc label{display:block;font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;color:#8a7c6c;margin:9px 0 3px;}
+.mc textarea,.mc select,.mc input{width:100%;font-family:'Lora',serif;font-size:.86rem;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fffdf8;}
+.mc textarea{min-height:60px;resize:vertical;}
+.mc .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mc .ft{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;align-items:center;}
+.mc .btn{background:var(--maroon);color:#fff;border:none;border-radius:18px;padding:8px 18px;font-weight:600;cursor:pointer;font-size:.78rem;}
+.mc .btn2{background:#faf4ea;color:var(--maroon);border:1px solid var(--line);border-radius:18px;padding:8px 14px;font-weight:600;cursor:pointer;font-size:.78rem;}
+.mc .rm{color:#c0392b;cursor:pointer;font-size:.72rem;margin-right:auto;}
 </style></head><body>
-<div class="top"><div class="tt">RÉIA — To Review</div><div><a href="index.html">← Archive hub</a><a href="shortlist.html">★ Finalised & replication</a><a href="worklist.html">🎨 Designer worklist</a></div></div>
+<div class="top"><div class="tt">RÉIA — To Review</div>
+  <div class="nav"><a href="index.html">← Hub</a><a class="here" href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a></div>
+</div>
+<div class="flow">FLOW: <b>1 Review</b> → 2 Star &amp; brief → 3 Assign on Board → 4 Replicate &amp; upload → 5 Feedback</div>
 <div class="wrap">
 <div class="bar">
   <span class="chip on" data-f="todo">Needs review</span>
   <span class="chip" data-f="considered">Considered ✓</span>
   <span class="chip" data-f="passed">Passed ✕</span>
+  <span class="chip" data-f="starred">★ Sent to replicate</span>
   <span class="chip" data-f="all">All</span>
-  <span class="chip" data-f="reel">Reels</span>
-  <span class="chip" data-f="static">Statics</span>
   <span class="who" id="who"></span>
 </div>
 <div id="count" class="muted" style="font-family:'Poppins',sans-serif;font-size:.7rem;margin-bottom:10px;"></div>
 <div id="list" class="grid"></div>
 </div>
+
+<div class="modal" id="amodal"><div class="mc" style="max-height:90vh;overflow:auto">
+  <h3>Send to replication — write the brief</h3>
+  <div class="sb" id="asub"></div>
+  <label>🎯 Objective — what are we trying to achieve?</label>
+  <textarea id="aobj" placeholder="e.g. Drive proposal-season DMs from 24–32yr couples in Bangalore; position 7-day delivery as the wedge vs Aukera."></textarea>
+  <label>✍️ Caption — the post caption text</label>
+  <textarea id="acap" placeholder="e.g. Designed with her, in her hands in 7 days. 💍 Lab-grown, EF/VVS, made in Bangalore. Comment RÉIA to start."></textarea>
+  <label>🅰️ On-creative copy — text that appears ON the creative</label>
+  <textarea id="acopy" placeholder="e.g. HEADLINE: 'Her ring. Her way. In 7 days.'  SUB: 'EF/VVS lab-grown · Bangalore'"></textarea>
+  <label>🎬 Creative direction — what the designer should make</label>
+  <textarea id="abrief" placeholder="e.g. Recreate this proposal reel with a real Bangalore couple; keep EF/VVS ring in close-up; end on the 7-day promise."></textarea>
+  <div class="row">
+    <div><label>Assign designer</label><select id="adz"><option value="">— unassigned —</option></select></div>
+    <div><label>Priority</label><select id="apr"><option>Urgent</option><option selected>Normal</option><option>High</option><option>Low</option></select></div>
+  </div>
+  <label>Campaign / folder</label>
+  <input id="acamp" list="campaigns" placeholder="e.g. Festive — Diwali · Anniversary">
+  <datalist id="campaigns"><option value="Festive — Diwali"></option><option value="Anniversary"></option><option value="Proposal / Engagement"></option><option value="Wedding / Bridal"></option><option value="Everyday / Self-purchase"></option><option value="Offer / Sale"></option><option value="Evergreen / Brand"></option></datalist>
+  <div class="ft"><span class="rm" id="arm" style="display:none">Remove from replication</span><button class="btn2" id="acancel">Cancel</button><button class="btn" id="asave">Send to replicate ★</button></div>
+</div></div>
+
 <script>
 var BACKEND=(window.REIA_BACKEND||"").trim();
-var NK="reiaReviewer";
-var FILTER="todo", ITEMS=[], REV={}, SHORT={};
+var FILTER="todo", ITEMS=[], REV={}, SHORT={}, PEOPLE={}, CURK=null;
 function esc(s){return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function isReel(x){return (x.media||"").toLowerCase().indexOf("reel")>-1;}
-function who(){var n=localStorage.getItem(NK);if(!n){n=prompt("Your name (so the team sees who reviewed it, e.g. Jacob):")||"";if(n){localStorage.setItem(NK,n);}}return n;}
-function showWho(){var n=localStorage.getItem(NK);document.getElementById("who").innerHTML=n?("reviewing as <b>"+esc(n)+"</b> · <span style='cursor:pointer;text-decoration:underline' onclick=\"localStorage.removeItem('reiaReviewer');location.reload();\">change</span>"):"";}
+function nm(){var n=localStorage.getItem("reiaReviewer");if(!n){n=prompt("Your name (e.g. Jacob):")||"";if(n)localStorage.setItem("reiaReviewer",n);}return n;}
+function showWho(){var n=localStorage.getItem("reiaReviewer");document.getElementById("who").innerHTML=n?("as <b>"+esc(n)+"</b> · <span style='cursor:pointer;text-decoration:underline' onclick=\"localStorage.removeItem('reiaReviewer');location.reload();\">change</span>"):"";}
 function status(ck){var r=REV[ck];return r&&(r.status||r.considered)||"";}
-function norm(s){return (s==="yes")?"considered":((s==="no")?"passed":s);}
-function post(o){if(!BACKEND)return;fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)});}
-function fetchState(cb){
-  if(!BACKEND){REV={};SHORT={};cb&&cb();return;}
-  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){REV=(j&&j.reviews)||{};SHORT=(j&&j.shortlist)||{};cb&&cb();}).catch(function(){cb&&cb();});
-}
+function norm(s){return s==="yes"?"considered":(s==="no"?"passed":s);}
+function post(o){if(!BACKEND)return Promise.resolve({});return fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)}).then(function(r){return r.json();}).catch(function(){return {};});}
+function fetchState(cb){if(!BACKEND){cb&&cb();return;}fetch(BACKEND).then(function(r){return r.json();}).then(function(j){REV=(j&&j.reviews)||{};SHORT=(j&&j.shortlist)||{};PEOPLE=(j&&j.people)||{};cb&&cb();}).catch(function(){cb&&cb();});}
+function designers(){return Object.keys(PEOPLE).sort();}
+function load(){if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Backend not connected.</b> Paste your /exec URL into page_urls.json → backend_url and re-run.</div>';return;}
+  fetch("creatives.json",{cache:"no-store"}).then(function(r){return r.json();}).then(function(a){ITEMS=a||[];fetchState(render);}).catch(function(){ITEMS=[];fetchState(render);});}
 function render(){
   var L=document.getElementById("list");
-  if(!ITEMS.length){L.innerHTML='<div class="setup"><b>No creatives file yet.</b><br>This tab fills automatically after the next scheduled run publishes <code>creatives.json</code>. Until then, review on the breakdown.</div>';return;}
-  var items=ITEMS.filter(function(x){
-    var st=norm(status(x.ckey));
-    if(FILTER==="todo")return x.new && st==="";
+  if(!ITEMS.length){L.innerHTML='<div class="setup"><b>No creatives yet.</b> This fills after the next scheduled run publishes creatives.json.</div>';return;}
+  var items=ITEMS.filter(function(x){var st=norm(status(x.ckey));
+    if(FILTER==="todo")return x.new&&st===""&&!SHORT[x.ckey];
     if(FILTER==="considered")return st==="considered";
     if(FILTER==="passed")return st==="passed";
-    if(FILTER==="reel")return isReel(x);
-    if(FILTER==="static")return !isReel(x);
-    return true;
-  });
-  var todo=ITEMS.filter(function(x){return x.new && norm(status(x.ckey))==="";}).length;
-  document.getElementById("count").innerHTML=(todo? ('<b style="color:#7B0017">'+todo+' new creative'+(todo==1?'':'s')+' awaiting a conscious review</b> · '):'')+items.length+" shown"+(BACKEND?"":' · <span style="color:#b78b2e">shared backend not connected — actions are local only until config/page_urls.json → backend_url is set</span>');
-  if(!items.length){L.innerHTML='<div class="empty">Nothing here'+(FILTER==="todo"?" — every new creative has been reviewed. ✓":" in this filter.")+'</div>';return;}
+    if(FILTER==="starred")return !!SHORT[x.ckey];
+    return true;});
+  var todo=ITEMS.filter(function(x){return x.new&&norm(status(x.ckey))===""&&!SHORT[x.ckey];}).length;
+  document.getElementById("count").innerHTML=(todo?('<b style="color:#7B0017">'+todo+' new awaiting review</b> · '):'')+items.length+" shown"+(BACKEND?"":' · backend not connected');
+  if(!items.length){L.innerHTML='<div class="empty">Nothing here'+(FILTER==="todo"?" — all caught up ✓":"")+'</div>';return;}
   L.innerHTML=items.map(function(x){
-    var st=norm(status(x.ckey)), r=REV[x.ckey]||{}, sl=!!SHORT[x.ckey];
-    var todo=(x.new && st==="");
+    var st=norm(status(x.ckey)),r=REV[x.ckey]||{},sl=SHORT[x.ckey];
+    var todo=x.new&&st===""&&!sl;
     var img=x.img?('<img src="'+esc(x.img)+'" referrerpolicy="no-referrer" loading="lazy">'):'<div class="noimg">no preview</div>';
     var by=(r.by?("by "+esc(r.by)+(r.at?(" · "+esc(r.at)):"")):"");
+    var asg=sl?('<span class="assigned">★ '+(sl.designer?("→ "+esc(sl.designer)):"to replicate")+(sl.priority&&sl.priority!=="Normal"?(" · "+esc(sl.priority)):"")+'</span>'):'';
     return '<div class="card'+(todo?' todo':'')+'" data-k="'+esc(x.ckey)+'">'+
-      '<div class="ph">'+img+(isReel(x)?'<span class="mb mb-r">REEL</span>':'<span class="mb mb-s">STATIC</span>')+(x.new?'<span class="newtag">NEW</span>':'')+'</div>'+
+      '<div class="ph">'+img+(isReel(x)?'<span class="mb mb-r">REEL</span>':'<span class="mb mb-s">STATIC</span>')+'<span class="star'+(sl?" on":"")+'" title="Send to replication">★</span></div>'+
       '<div class="bd"><div class="br">'+esc(x.brand)+'</div><div class="ct">'+esc(x.cat)+'</div>'+
-      '<a class="vl" href="'+esc(x.link)+'" target="_blank" rel="noopener">view live ad ↗</a>'+
+      '<a class="vl" href="'+esc(x.link)+'" target="_blank" rel="noopener">view live ad ↗</a>'+asg+
       '<div class="acts"><button class="ok'+(st==="considered"?" act":"")+'" data-a="considered">Consider ✓</button>'+
-      '<button class="no'+(st==="passed"?" act":"")+'" data-a="passed">Pass ✕</button>'+
-      '<button class="sl'+(sl?" act":"")+'" data-a="shortlist">★</button></div>'+
-      '<div class="stat">'+(st?(st==="considered"?"Considered for Réia "+by:"Reviewed & passed "+by):"awaiting review")+'</div></div></div>';
+      '<button class="no'+(st==="passed"?" act":"")+'" data-a="passed">Pass ✕</button></div>'+
+      '<div class="stat">'+(st?(st==="considered"?"Considered "+by:"Passed "+by):"awaiting review")+'</div></div></div>';
   }).join("");
-  L.querySelectorAll(".card").forEach(function(c){
-    var ck=c.getAttribute("data-k"), x=ITEMS.filter(function(i){return i.ckey===ck;})[0];
-    c.querySelectorAll(".acts button").forEach(function(b){
-      b.addEventListener("click",function(){
-        var a=b.getAttribute("data-a"), nm=who();
-        if(a==="shortlist"){
-          if(SHORT[ck]){delete SHORT[ck];post({kind:"shortlist",ckey:ck,remove:true});}
-          else{SHORT[ck]={kind:"shortlist",ckey:ck,brand:x.brand,media:x.media,cat:x.cat,link:x.link,img:x.img,reason:"",replicated:"no",usage:"",by:nm};post(SHORT[ck]);}
-        }else{
-          var cur=norm(status(ck));var nxt=(cur===a)?"":a;
-          if(nxt===""){delete REV[ck];post({kind:"review",ckey:ck,remove:true});}
-          else{REV[ck]={kind:"review",ckey:ck,brand:x.brand,media:x.media,cat:x.cat,link:x.link,img:x.img,status:nxt,by:nm,at:new Date().toISOString().slice(0,10)};post(REV[ck]);}
-        }
-        render();
-      });
-    });
+  bind();
+}
+function bind(){
+  document.querySelectorAll(".card").forEach(function(c){
+    var ck=c.getAttribute("data-k"),x=ITEMS.filter(function(i){return i.ckey===ck;})[0];
+    c.querySelector(".star").addEventListener("click",function(){openAssign(x);});
+    c.querySelectorAll(".acts button").forEach(function(b){b.addEventListener("click",function(){
+      var a=b.getAttribute("data-a"),cur=norm(status(ck)),nxt=cur===a?"":a,me=nm();
+      if(nxt===""){delete REV[ck];post({kind:"review",ckey:ck,remove:true});}
+      else{REV[ck]={kind:"review",ckey:ck,brand:x.brand,media:x.media,cat:x.cat,link:x.link,img:x.img,status:nxt,by:me,at:new Date().toISOString().slice(0,10)};post(REV[ck]);
+        if(nxt==="considered"&&!SHORT[ck]){openAssign(x);} }
+      render();});});
   });
 }
+function openAssign(x){
+  CURK=x.ckey;var sl=SHORT[x.ckey]||{};
+  document.getElementById("asub").innerHTML=esc(x.brand)+' · '+esc(x.cat)+' · '+(isReel(x)?"Reel":"Static");
+  var dz=document.getElementById("adz");dz.innerHTML='<option value="">— unassigned —</option>'+designers().map(function(d){return '<option'+((sl.designer||"")===d?' selected':'')+'>'+esc(d)+'</option>';}).join("");
+  document.getElementById("aobj").value=sl.objective||"";
+  document.getElementById("acap").value=sl.caption||"";
+  document.getElementById("acopy").value=sl.copy||"";
+  document.getElementById("abrief").value=sl.reason||"";
+  document.getElementById("apr").value=sl.priority||"Normal";
+  document.getElementById("acamp").value=sl.campaign||"";
+  document.getElementById("arm").style.display=sl.ckey?"inline":"none";
+  document.getElementById("asave").textContent=sl.ckey?"Save brief":"Send to replicate ★";
+  document.getElementById("amodal").classList.add("on");
+}
+function closeAssign(){document.getElementById("amodal").classList.remove("on");CURK=null;}
+document.getElementById("acancel").addEventListener("click",closeAssign);
+document.getElementById("asave").addEventListener("click",function(){
+  if(!CURK)return;var x=ITEMS.filter(function(i){return i.ckey===CURK;})[0]||{};
+  var o={kind:"shortlist",ckey:CURK,brand:x.brand,media:x.media,cat:x.cat,link:x.link,img:x.img,
+    objective:document.getElementById("aobj").value,caption:document.getElementById("acap").value,
+    copy:document.getElementById("acopy").value,reason:document.getElementById("abrief").value,
+    designer:document.getElementById("adz").value,priority:document.getElementById("apr").value,
+    campaign:document.getElementById("acamp").value,assets:(SHORT[CURK]&&SHORT[CURK].assets)||"",
+    replicated:(SHORT[CURK]&&SHORT[CURK].replicated)||"no",by:nm()};
+  SHORT[CURK]=o;post(o);closeAssign();render();
+});
+document.getElementById("arm").addEventListener("click",function(){if(!CURK)return;post({kind:"shortlist",ckey:CURK,remove:true});delete SHORT[CURK];closeAssign();render();});
 document.querySelectorAll(".chip").forEach(function(c){c.addEventListener("click",function(){document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});c.classList.add("on");FILTER=c.getAttribute("data-f");render();});});
-function boot(){showWho();fetch("creatives.json",{cache:"no-store"}).then(function(r){return r.json();}).then(function(a){ITEMS=a||[];fetchState(render);}).catch(function(){ITEMS=[];render();});}
-boot();
+showWho();load();
 setInterval(function(){fetchState(render);},30000);
 </script>
 </body></html>
-<!-- tail-guard 1 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 2 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 3 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 4 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 5 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 6 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 7 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 8 (after </html>, truncation here is harmless) -->
+<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->

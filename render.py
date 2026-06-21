@@ -54,7 +54,7 @@ BACKEND=""
 try: BACKEND=(json.load(open(BASE+"/page_urls.json")).get("backend_url") or "").strip()
 except: pass
 CREATIVES={}
-def rid(a): return str(COLLATION.get(a["link"]) or a["link"])
+def rid(a): return str(a.get("ckey") or COLLATION.get(a["link"]) or a["link"])  # content-stable id from classify (survives re-scrapes)
 def chip(c): return f'<span class="cat" style="background:{CATCOL.get(c,"#777")}">{html.escape(c)}</span>'
 def imgtag(u,extra=""): return f'<img class="lz" data-src="{html.escape(u)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt=""{extra}>'
 def ckey(a):
@@ -481,5 +481,7 @@ BJS='<script>window.REIA_BACKEND="'+BACKEND+'";</script>'
 OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><meta name=referrer content=no-referrer><title>Reia Competitor Intelligence</title>"+BJS+"<style>"+CSS+"</style></head><body>"+''.join(B)+LAZY+SEARCH+SAVED+REVIEW+"</body></html>"
 open(BASE+"/reports/Reia-Competitor-Creative-Breakdown.html","w",encoding="utf-8").write(OUT)
 json.dump(sorted(CREATIVES.values(), key=lambda x:(not x["new"], x["brand"])), open(A+"creatives.json","w"))
-print("WROTE",len(OUT),"chars ·",OUT.count('class="star"'),"stars ·",OUT.count('class="rvbtn"'),"review ·",OUT.count('newrib'),"new · creatives.json",len(CREATIVES))
-# padding 1 — guards file tail against O
+print("WROTE", len(OUT), "chars,", OUT.count('class="star"'), "stars,", OUT.count('class="rvbtn"'), "review,", OUT.count('newrib'), "new, creatives.json", len(CREATIVES))
+# tail-guard padding (truncation here is harmless)
+# tail-guard padding (truncation here is harmless)
+# tail-guard padding (truncation here is harmless)

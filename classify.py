@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import csv, json, re, glob, os
+import csv, json, re, glob, os, hashlib
 from datetime import date
 from collections import defaultdict, Counter
 import os
@@ -12,7 +12,19 @@ try: COLL=json.load(open(BASE+"/data/assets/collation_map.json"))
 except Exception: COLL={}
 try: SEEN=json.load(open(BASE+"/data/seen.json"))
 except Exception: SEEN={}
+try: RUNIMG=json.load(open(BASE+"/data/assets/run_img.json"))
+except Exception: RUNIMG={}
 PREV_KEYS=set(SEEN.keys())   # which creatives existed BEFORE this run -> anything not here is NEW
+
+def stable_key(x):
+    """A creative id that SURVIVES weekly re-scrapes (the ad link/id changes each scrape, so we must
+    key on CONTENT, not the link). Priority: Meta collation_id -> brand+message hash -> image filename."""
+    cid=COLL.get(x["link"])
+    if cid: return str(cid)   # Meta collation_id is already stable across scrapes — keep as-is (preserves existing reviews)
+    t=re.sub(r'\d+',' ',re.sub(r'\W+',' ',(x.get("copy") or ""))).strip().lower()[:90]
+    if len(t)>=10: return "t_"+hashlib.md5(((x.get("brand") or "")+"|"+t).encode()).hexdigest()[:16]
+    u=RUNIMG.get(x["link"]); fn=u.split("?")[0].rsplit("/",1)[-1] if u else x["link"]
+    return "i_"+hashlib.md5(fn.encode()).hexdigest()[:16]
 
 def days(s):
     try:
@@ -174,7 +186,7 @@ for x in rows:
     x["media"]="Reel" if (x.get("hasvid")=="1" or x["fmt"]=="VIDEO") else "Static"
     x["status"]=("Winning" if dd>=14 else "Losing" if dd>=7 else "Newly") if dd is not None else "?"
     x["cat"]=category(x["copy"],x["title"],x["fmt"])
-    x["ckey"]=str(COLL.get(x["link"]) or x["link"])     # stable creative id (review/save key, survives weekly runs)
+    x["ckey"]=stable_key(x)                              # content-stable creative id (review/save key, survives weekly runs)
 # --- update the append-only seen ledger: first-seen date + how many runs each creative has appeared in ---
 for x in rows:
     if x["status"]=="?": continue
@@ -251,13 +263,4 @@ except Exception as _pe:
 # padding line 15 — guards the file tail against OneDrive sync truncation; safe to ignore
 # padding line 16 — guards the file tail against OneDrive sync truncation; safe to ignore
 # padding line 17 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 18 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 19 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 20 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 21 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 22 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 23 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 24 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 25 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 26 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding lin
+# padding line 18 
