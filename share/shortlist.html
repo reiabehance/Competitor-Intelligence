@@ -1,202 +1,176 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="referrer" content="no-referrer">
-<title>Réia — Finalised & Replication</title>
+<meta name="referrer" content="no-referrer"><title>Réia — Finalised & Replication</title>
 <script src="config.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@400;500;600&family=Lora&display=swap');
-:root{--maroon:#7B0017;--ink:#15150e;--line:#e6dccb;--gold:#b78b2e;--win:#3f8f4f;--lose:#c47d2a;--prog:#b78b2e;--paper:#f3ecdf;}
+:root{--maroon:#7B0017;--ink:#15150e;--line:#e6dccb;--gold:#b78b2e;--paper:#f3ecdf;--done:#3f8f4f;--work:#b78b2e;--todo:#9a8f80;--block:#c0392b;--urgent:#c0392b;--high:#d77a2b;--normal:#6b7a8f;--low:#9aa7b0;}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Lora',Georgia,serif;}
-.top{background:var(--maroon);color:#fff;padding:18px 26px;box-shadow:0 2px 12px rgba(0,0,0,.18);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
-.top .tt{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;}
-.top a{color:#ffd9a8;font-family:'Poppins',sans-serif;font-size:.78rem;text-decoration:none;margin-left:14px;}
-.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 80px;}
-.pipe{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px;font-family:'Poppins',sans-serif;}
-.pcell{background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 15px;min-width:120px;}
-.pcell .n{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--maroon);line-height:1;}
-.pcell .l{font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:#8a7c6c;margin-top:3px;}
-.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 18px;font-family:'Poppins',sans-serif;font-size:.72rem;}
+.top{background:var(--maroon);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.top .tt{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:700;}
+.nav a{color:#ffd9a8;font-family:'Poppins',sans-serif;font-size:.74rem;text-decoration:none;margin-left:12px;}
+.nav a.here{color:#fff;border-bottom:2px solid var(--gold);padding-bottom:2px;}
+.flow{background:#efe4cf;font-family:'Poppins',sans-serif;font-size:.62rem;color:#6b5f54;text-align:center;padding:5px;}
+.flow b{color:var(--maroon);}
+.wrap{max-width:1120px;margin:0 auto;padding:16px 18px 80px;}
+.pipe{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0 12px;font-family:'Poppins',sans-serif;}
+.pc{background:#fff;border:1px solid var(--line);border-radius:11px;padding:8px 13px;min-width:104px;border-left:5px solid var(--todo);}
+.pc.work{border-left-color:var(--work);}.pc.block{border-left-color:var(--block);}.pc.done{border-left-color:var(--done);}.pc.up{border-left-color:var(--gold);}.pc.tot{border-left-color:var(--maroon);}
+.pc .n{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--maroon);line-height:1;}
+.pc .l{font-size:.56rem;text-transform:uppercase;letter-spacing:.05em;color:#8a7c6c;margin-top:3px;}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 16px;font-family:'Poppins',sans-serif;font-size:.72rem;}
 .chip{background:#faf4ea;border:1px solid var(--line);border-radius:18px;padding:6px 13px;cursor:pointer;color:#6b5f54;}
 .chip.on{background:var(--maroon);color:#fff;border-color:var(--maroon);}
 .muted{color:#8a7c6c;}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 2px 10px rgba(0,0,0,.06);display:grid;grid-template-columns:260px 1fr;gap:16px;}
-@media(max-width:720px){.card{grid-template-columns:1fr;}}
-.beforeafter{display:flex;gap:10px;}
-.ba{flex:1;text-align:center;}
-.ba .lab{font-family:'Poppins',sans-serif;font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;color:#8a7c6c;margin-bottom:4px;}
-.ba img{width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line);}
-.ba .noimg,.ba .drop{width:100%;height:120px;border-radius:10px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;color:#a89a88;font-family:'Poppins',sans-serif;font-size:.58rem;text-align:center;padding:6px;cursor:pointer;}
-.ba .drop:hover{border-color:var(--gold);color:var(--gold);background:#fffaf1;}
-.ba .drop.busy{color:var(--maroon);border-color:var(--maroon);}
-.hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
-.hd b{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--maroon);}
-.mb-r,.mb-s{font-family:'Poppins',sans-serif;font-size:.56rem;font-weight:700;padding:2px 7px;border-radius:8px;color:#fff;}
-.mb-r{background:#7B0017;}.mb-s{background:#2f4d7a;}
-.cat{font-family:'Poppins',sans-serif;font-size:.62rem;color:#fff;background:#9a8f80;padding:2px 9px;border-radius:11px;}
-.camp{font-family:'Poppins',sans-serif;font-size:.62rem;font-weight:600;color:#7B0017;background:#f6e9cf;border:1px solid #e6cf9a;padding:2px 9px;border-radius:11px;}
-.grp{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:700;color:var(--maroon);border-bottom:2px solid #e6cf9a;padding:14px 0 5px;margin-top:18px;display:flex;align-items:center;gap:8px;}
-.grp .gn{font-family:'Poppins',sans-serif;font-size:.62rem;font-weight:600;color:#fff;background:var(--gold);border-radius:10px;padding:1px 8px;}
-.fld input[type=text],.bar select{width:100%;font-family:'Poppins',sans-serif;font-size:.82rem;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fffdf8;color:var(--ink);}
-.bar select{width:auto;}
-.stg{font-family:'Poppins',sans-serif;font-size:.56rem;font-weight:700;padding:2px 9px;border-radius:11px;color:#fff;}
-.stg-no{background:#9a8f80;}.stg-in{background:var(--prog);}.stg-done{background:var(--win);}
-.hd a.view{font-family:'Poppins',sans-serif;font-size:.7rem;color:#2f4d7a;text-decoration:none;margin-left:auto;}
-.fld{margin:7px 0;font-family:'Poppins',sans-serif;font-size:.72rem;}
-.fld label{display:block;color:#8a7c6c;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
-.fld textarea,.fld select{width:100%;font-family:'Lora',serif;font-size:.86rem;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fffdf8;color:var(--ink);}
-.fld textarea{min-height:44px;resize:vertical;}
-.row2{display:grid;grid-template-columns:210px 1fr;gap:12px;}@media(max-width:720px){.row2{grid-template-columns:1fr;}}
+select.flt{background:#faf4ea;border:1px solid var(--line);border-radius:16px;padding:6px 10px;font-family:'Poppins',sans-serif;font-size:.7rem;}
+.card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px;margin:11px 0;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+.hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.hd .tn{width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--line);}
+.hd b{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--maroon);}
+.pill{font-family:'Poppins',sans-serif;font-size:.54rem;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;}
+.mb-r{background:#7B0017;}.mb-s{background:#2f4d7a;}.cat{background:#9a8f80;}
+.st-done{background:var(--done);}.st-work{background:var(--work);}.st-todo{background:var(--todo);}.st-block{background:var(--block);}
+.pr-urgent{background:var(--urgent);}.pr-high{background:var(--high);}.pr-normal{background:var(--normal);}.pr-low{background:var(--low);}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin:5px 0;}@media(max-width:720px){.r3{grid-template-columns:1fr;}}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:5px 0;}@media(max-width:720px){.r2{grid-template-columns:1fr;}}
+.fld label{display:block;font-family:'Poppins',sans-serif;color:#8a7c6c;font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
+.fld textarea,.fld select,.fld input{width:100%;font-family:'Lora',serif;font-size:.84rem;border:1px solid var(--line);border-radius:8px;padding:6px 9px;background:#fffdf8;color:var(--ink);}
+.fld input{font-family:'Poppins',sans-serif;font-size:.8rem;}
+.fld textarea{min-height:40px;resize:vertical;}
+.delv{margin:8px 0;}
+.delv .dl{font-family:'Poppins',sans-serif;font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;color:#8a7c6c;margin-bottom:5px;}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}@media(max-width:680px){.slots{grid-template-columns:repeat(2,1fr);}}
+.slot{border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;font-family:'Poppins',sans-serif;background:#fdfaf4;}
+.slot .sn{font-size:.6rem;font-weight:700;margin-bottom:5px;}
+.slot img{width:100%;height:74px;object-fit:cover;border-radius:7px;border:1px solid var(--line);background:#efe7d8;}
+.slot .ph{width:100%;height:74px;border-radius:7px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;color:#b0a290;font-size:.58rem;}
+.slot .sa{display:flex;gap:5px;justify-content:center;margin-top:5px;flex-wrap:wrap;}
+.slot a,.slot button{font-size:.58rem;font-weight:600;text-decoration:none;border:1px solid var(--line);background:#faf4ea;color:#7B0017;border-radius:12px;padding:3px 8px;cursor:pointer;}
+.slot button.up{background:var(--gold);color:#1a1a12;border:none;}
 .acts{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
-.btn{font-family:'Poppins',sans-serif;font-size:.72rem;font-weight:600;border:none;border-radius:20px;padding:7px 15px;cursor:pointer;}
-.btn.save{background:var(--win);color:#fff;}.btn.rm{background:#fcecec;color:#c0392b;}
-.btn.up{background:var(--gold);color:#1a1a12;}
-.by{font-family:'Poppins',sans-serif;font-size:.64rem;color:#8a7c6c;}
+.btn{font-family:'Poppins',sans-serif;font-size:.72rem;font-weight:600;border:none;border-radius:18px;padding:7px 14px;cursor:pointer;}
+.btn.save{background:var(--done);color:#fff;}.btn.rm{background:#fcecec;color:#c0392b;}
+.by{font-family:'Poppins',sans-serif;font-size:.62rem;color:#8a7c6c;}
 .empty{text-align:center;color:#8a7c6c;font-family:'Poppins',sans-serif;padding:50px 10px;}
 .setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
 </style></head><body>
-<div class="top"><div class="tt">RÉIA — Finalised &amp; Replication</div><div><a href="index.html">← Archive hub</a><a href="review.html">🔔 To review</a><a href="worklist.html">🎨 Designer worklist</a></div></div>
+<div class="top"><div class="tt">RÉIA — Finalised &amp; Replication</div>
+  <div class="nav"><a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="mywork.html">🧑‍🎨 My work</a><a class="here" href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a></div>
+</div>
+<div class="flow">FLOW: 1 Review → 2 Star &amp; brief → 3 Assign → 4 Replicate &amp; upload → <b>5 Feedback (here)</b></div>
 <div class="wrap">
 <div id="pipe" class="pipe"></div>
 <div class="bar">
   <span class="muted">Filter:</span>
-  <span class="chip on" data-f="all">All finalised</span>
+  <span class="chip on" data-f="all">All</span>
   <span class="chip" data-f="no">To replicate</span>
   <span class="chip" data-f="in-progress">Replicating</span>
+  <span class="chip" data-f="blocked">Not working</span>
   <span class="chip" data-f="done">Replicated ✓</span>
-  <span class="chip" data-f="uploaded">Has our creative</span>
-  <span class="chip" data-f="reel">Reels</span>
-  <span class="chip" data-f="static">Statics</span>
-  <span class="muted" style="margin-left:8px;">Campaign:</span>
-  <select id="campfilter"><option value="all">All campaigns</option></select>
+  <span class="chip" data-f="uploaded">Has deliverables</span>
+  <select class="flt" id="fcamp"><option value="all">All campaigns</option></select>
+  <select class="flt" id="fdz"><option value="all">All designers</option></select>
+  <select class="flt" id="fpr"><option value="all">All priorities</option><option>Urgent</option><option>High</option><option>Normal</option><option>Low</option></select>
   <span id="count" class="muted" style="margin-left:auto;"></span>
 </div>
-<datalist id="campaigns">
-  <option value="Festive — Diwali"></option><option value="Festive — Akshaya Tritiya"></option>
-  <option value="Festive — Valentine's"></option><option value="Festive — Karwa Chauth"></option>
-  <option value="Festive — Raksha Bandhan"></option><option value="Anniversary"></option>
-  <option value="Proposal / Engagement"></option><option value="Wedding / Bridal"></option>
-  <option value="Everyday / Self-purchase"></option><option value="Offer / Sale"></option>
-  <option value="Store launch / Footfall"></option><option value="Evergreen / Brand"></option>
-</datalist>
+<datalist id="campaigns"><option value="Festive — Diwali"></option><option value="Anniversary"></option><option value="Proposal / Engagement"></option><option value="Wedding / Bridal"></option><option value="Everyday / Self-purchase"></option><option value="Offer / Sale"></option><option value="Evergreen / Brand"></option></datalist>
 <div id="list"></div>
 </div>
 <script>
 var BACKEND=(window.REIA_BACKEND||"").trim();
-var FILTER="all", CAMPFILTER="all", DATA={};
-function campOf(x){return (x.campaign&&(""+x.campaign).trim())?(""+x.campaign).trim():"Unassigned";}
-function campChip(x){var c=x.campaign&&(""+x.campaign).trim();return c?'<span class="camp">🏷 '+esc(c)+'</span>':'<span class="camp" style="color:#a8997f;background:#f4efe6;border-color:#e6dccb">＋ tag a campaign</span>';}
+var FILTER="all", FCAMP="all", FDZ="all", FPR="all", DATA={}, PEOPLE={};
+var STAGES=[["no","To replicate","st-todo"],["in-progress","Replicating","st-work"],["blocked","Blocked / not working","st-block"],["done","Replicated ✓","st-done"]];
+var PRIOS=["Urgent","High","Normal","Low"];
+var FORMATS=[["sq","1:1 Square","img"],["portrait","4:5 Portrait","img"],["story","9:16 Story","img"],["reel","Reel / Video","link"]];
 function esc(s){return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function isReel(x){return (x.media||"").toLowerCase().indexOf("reel")>-1;}
-function badge(x){return isReel(x)?'<span class="mb-r">REEL</span>':'<span class="mb-s">STATIC</span>';}
-function stage(r){r=r||"no";return r==="done"?'<span class="stg stg-done">Replicated ✓</span>':(r==="in-progress"?'<span class="stg stg-in">Replicating</span>':'<span class="stg stg-no">To replicate</span>');}
+function campOf(x){return (x.campaign&&(""+x.campaign).trim())?(""+x.campaign).trim():"Unassigned";}
+function stageMeta(r){r=r||"no";for(var i=0;i<STAGES.length;i++)if(STAGES[i][0]===r)return STAGES[i];return STAGES[0];}
+function designers(){return Object.keys(PEOPLE).sort();}
+function nm(){var n=localStorage.getItem("reiaReviewer");if(!n){n=prompt("Your name (e.g. Réia):")||"";if(n)localStorage.setItem("reiaReviewer",n);}return n;}
+function assetsOf(x){var a={};try{a=JSON.parse(x.assets||"{}");}catch(e){a={};}return a;}
+function aurl(v){if(/^https?:/.test(v))return {view:v,dl:v,thumb:v};return {view:"https://drive.google.com/uc?export=view&id="+v,dl:"https://drive.google.com/uc?export=download&id="+v,thumb:"https://drive.google.com/thumbnail?id="+v+"&sz=w240"};}
 function load(){
-  if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Shared backend not connected yet.</b><br>Follow <i>backend_apps_script.gs</i> to create the Google Sheet web app, paste its URL into <code>config/page_urls.json → backend_url</code>, and re-run. Then every shortlisted creative, its replication stage, and the Réia version your team uploads all show here, live.</div>';return;}
-  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store. Check the backend URL.</div>';});
+  if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Backend not connected.</b> Paste your /exec URL into page_urls.json → backend_url and re-run.</div>';return;}
+  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};PEOPLE=(j&&j.people)||{};render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store.</div>';});
 }
-function cell(n,l){return '<div class="pcell"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
-function counts(){
-  var a=Object.keys(DATA).map(function(k){return DATA[k];});
-  var no=0,ip=0,dn=0,up=0;
-  a.forEach(function(x){var r=x.replicated||"no";if(r==="done")dn++;else if(r==="in-progress")ip++;else no++;if(x.our_creative)up++;});
-  document.getElementById("pipe").innerHTML=
-    cell(a.length,"Finalised")+cell(no,"To replicate")+cell(ip,"Replicating")+cell(dn,"Replicated ✓")+cell(up,"Our creative uploaded");
-}
+function pc(cls,n,l){return '<div class="pc '+cls+'"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
+function counts(){var a=Object.keys(DATA).map(function(k){return DATA[k];});var c={no:0,"in-progress":0,blocked:0,done:0},up=0;
+  a.forEach(function(x){c[x.replicated||"no"]=(c[x.replicated||"no"]||0)+1;if(x.assets&&x.assets!=="{}"&&x.assets!=="")up++;});
+  document.getElementById("pipe").innerHTML=pc("tot",a.length,"Finalised")+pc("",c.no||0,"To replicate")+pc("work",c["in-progress"]||0,"Working")+pc("block",c.blocked||0,"Not working")+pc("done",c.done||0,"Completed")+pc("up",up,"Has deliverables");}
+function fillFilter(id,vals){var s=document.getElementById(id);if(s.options.length>1)return;vals.forEach(function(v){var o=document.createElement("option");o.textContent=v;s.appendChild(o);});}
 function render(){
   counts();
-  var items=Object.keys(DATA).map(function(k){return DATA[k];});
-  items=items.filter(function(x){
-    if(FILTER==="all")return true;
-    if(FILTER==="reel")return isReel(x);
-    if(FILTER==="static")return !isReel(x);
-    if(FILTER==="uploaded")return !!x.our_creative;
-    return (x.replicated||"no")===FILTER;
-  });
-  // build the campaign filter dropdown from everything finalised (so designers can jump to a folder)
   var all=Object.keys(DATA).map(function(k){return DATA[k];});
-  var camps={};all.forEach(function(x){camps[campOf(x)]=(camps[campOf(x)]||0)+1;});
-  var sel=document.getElementById("campfilter"),prev=CAMPFILTER;
-  var names=Object.keys(camps).sort(function(a,b){return a==="Unassigned"?1:(b==="Unassigned"?-1:a.localeCompare(b));});
-  sel.innerHTML='<option value="all">All campaigns ('+all.length+')</option>'+names.map(function(n){return '<option value="'+esc(n)+'"'+(prev===n?' selected':'')+'>'+esc(n)+' ('+camps[n]+')</option>';}).join("");
-  if(CAMPFILTER!=="all"&&!camps[CAMPFILTER]){CAMPFILTER="all";}
-  if(CAMPFILTER!=="all")items=items.filter(function(x){return campOf(x)===CAMPFILTER;});
-  // group like folders: campaign -> brand
+  var camps={};all.forEach(function(x){camps[campOf(x)]=1;});fillFilter("fcamp",Object.keys(camps).sort());fillFilter("fdz",designers().concat(["Unassigned"]));
+  var items=all.filter(function(x){
+    if(FILTER!=="all"){if(FILTER==="uploaded"){if(!x.assets||x.assets==="{}"||x.assets==="")return false;}else if((x.replicated||"no")!==FILTER)return false;}
+    if(FCAMP!=="all"&&campOf(x)!==FCAMP)return false;
+    if(FDZ!=="all"&&((x.designer||"Unassigned")||"Unassigned")!==FDZ)return false;
+    if(FPR!=="all"&&(x.priority||"Normal")!==FPR)return false;return true;});
   items.sort(function(p,q){return campOf(p).localeCompare(campOf(q))||(p.brand||"").localeCompare(q.brand||"");});
   document.getElementById("count").textContent=items.length+" shown";
   var L=document.getElementById("list");
-  if(!items.length){L.innerHTML='<div class="empty">No finalised creatives'+((FILTER==="all"&&CAMPFILTER==="all")?" yet. Open the breakdown or the To Review tab and click ★ to finalise a creative for replication.":" in this filter.")+'</div>';return;}
+  if(!items.length){L.innerHTML='<div class="empty">Nothing here. Star creatives on To-Review to send them here with a brief.</div>';return;}
   var html="",curg=null;
-  items.forEach(function(x){var g=campOf(x);if(g!==curg){curg=g;var cnt=items.filter(function(y){return campOf(y)===g;}).length;html+='<div class="grp">🏷 '+esc(g)+' <span class="gn">'+cnt+'</span></div>';}html+=card(x);});
-  L.innerHTML=html;
-  bind();
+  items.forEach(function(x){var g=campOf(x);if(g!==curg){curg=g;html+='<div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;font-weight:700;color:#7B0017;border-bottom:2px solid #e6cf9a;padding:12px 0 4px;margin-top:14px">🏷 '+esc(g)+'</div>';}html+=card(x);});
+  L.innerHTML=html;bind();
+}
+function slots(x){var a=assetsOf(x);
+  return '<div class="delv"><div class="dl">Deliverables — finished files by format (download or replace)</div><div class="slots">'+
+    FORMATS.map(function(f){var has=a[f[0]];var u=has?aurl(has):null;
+      var preview=has?('<a href="'+u.view+'" target="_blank" rel="noopener"><img src="'+u.thumb+'" referrerpolicy="no-referrer"></a>'):'<div class="ph">'+(f[2]==="link"?"paste link":"no file")+'</div>';
+      var actions=has?('<a href="'+u.view+'" target="_blank" rel="noopener">View ↗</a><a href="'+u.dl+'" target="_blank" rel="noopener">⬇</a>'+(f[2]==="link"?'<button class="lk" data-slot="'+f[0]+'">Edit</button>':'<button class="up" data-slot="'+f[0]+'">Replace</button>')):
+        (f[2]==="link"?'<button class="lk" data-slot="'+f[0]+'">Paste link</button>':'<button class="up" data-slot="'+f[0]+'">Upload</button><button class="lk" data-slot="'+f[0]+'">link</button>');
+      return '<div class="slot"><div class="sn">'+f[1]+'</div>'+preview+'<div class="sa">'+actions+'</div></div>';
+    }).join("")+'</div></div>';
 }
 function card(x){
-    var orig=x.img?('<img src="'+esc(x.img)+'" referrerpolicy="no-referrer">'):'<div class="noimg">competitor<br>original</div>';
-    var ours=x.our_creative?('<img src="'+esc(x.our_creative)+'" referrerpolicy="no-referrer">'):'<div class="drop" data-up>＋ upload<br>our Réia version</div>';
-    var rep=x.replicated||"no";
-    function opt(v,t){return '<option value="'+v+'"'+(rep===v?' selected':'')+'>'+t+'</option>';}
-    return '<div class="card" data-k="'+esc(x.ckey)+'">'+
-      '<div class="beforeafter"><div class="ba"><div class="lab">Competitor original</div>'+orig+'</div>'+
-      '<div class="ba"><div class="lab">Our Réia creative</div>'+ours+'<input type="file" accept="image/*" class="upfile" hidden></div></div>'+
-      '<div><div class="hd"><b>'+esc(x.brand)+'</b>'+badge(x)+'<span class="cat">'+esc(x.cat)+'</span>'+stage(rep)+campChip(x)+'<a class="view" href="'+esc(x.link)+'" target="_blank" rel="noopener">view original ↗</a></div>'+
-      '<div class="fld"><label>Campaign / folder — what is this creative for?</label><input type="text" class="campaign" list="campaigns" placeholder="e.g. Festive — Diwali · Anniversary · Proposal / Engagement" value="'+esc(x.campaign||"")+'"></div>'+
-      '<div class="fld"><label>Why we shortlisted it</label><textarea class="reason">'+esc(x.reason)+'</textarea></div>'+
-      '<div class="row2"><div class="fld"><label>Replication stage</label><select class="replicated">'+opt("no","To replicate")+opt("in-progress","Replicating")+opt("done","Replicated ✓")+'</select></div>'+
-      '<div class="fld"><label>How we\'re using it for Réia</label><textarea class="usage">'+esc(x.usage)+'</textarea></div></div>'+
-      '<div class="acts"><button class="btn save">Save</button><button class="btn up">⬆ Upload our creative</button>'+
-      (x.our_creative?'<a class="btn" style="background:#faf4ea;color:#7B0017" href="'+esc(x.our_creative)+'" target="_blank" rel="noopener">View our creative ↗</a>':'')+
-      '<button class="btn rm">Remove</button><span class="by">'+(x.by?("by "+esc(x.by)):"")+(x.at?(" · "+esc(x.at)):"")+'</span></div>'+
-      '</div></div>';
+  var sm=stageMeta(x.replicated),th=x.img?('<img class="tn" src="'+esc(x.img)+'" referrerpolicy="no-referrer">'):'';
+  function so(){return STAGES.map(function(s){return '<option value="'+s[0]+'"'+((x.replicated||"no")===s[0]?' selected':'')+'>'+s[1]+'</option>';}).join("");}
+  function dzo(){return '<option value="">— assign designer —</option>'+designers().map(function(d){return '<option'+((x.designer||"")===d?' selected':'')+'>'+esc(d)+'</option>';}).join("");}
+  function pro(){return PRIOS.map(function(p){return '<option'+((x.priority||"Normal")===p?' selected':'')+'>'+p+'</option>';}).join("");}
+  return '<div class="card" data-k="'+esc(x.ckey)+'">'+
+    '<div class="hd">'+th+'<b>'+esc(x.brand)+'</b><span class="pill '+(isReel(x)?"mb-r":"mb-s")+'">'+(isReel(x)?"REEL":"STATIC")+'</span>'+
+      '<span class="pill cat">'+esc(x.cat)+'</span><span class="pill '+sm[2]+'">'+sm[1]+'</span><span class="pill pr-'+((x.priority||"Normal").toLowerCase())+'">'+esc(x.priority||"Normal")+'</span>'+
+      '<a style="margin-left:auto;font-family:Poppins;font-size:.66rem;color:#2f4d7a;text-decoration:none" href="'+esc(x.link)+'" target="_blank" rel="noopener">original ↗</a></div>'+
+    '<div class="r3"><div class="fld"><label>Campaign / folder</label><input class="campaign" list="campaigns" value="'+esc(x.campaign||"")+'"></div>'+
+      '<div class="fld"><label>Designer</label><select class="designer">'+dzo()+'</select></div>'+
+      '<div class="fld"><label>Priority</label><select class="priority">'+pro()+'</select></div></div>'+
+    '<div class="r2"><div class="fld"><label>🎯 Objective — what we want to achieve</label><textarea class="objective">'+esc(x.objective)+'</textarea></div>'+
+      '<div class="fld"><label>🎬 Creative direction — what to make</label><textarea class="reason">'+esc(x.reason)+'</textarea></div></div>'+
+    '<div class="r2"><div class="fld"><label>✍️ Caption</label><textarea class="caption">'+esc(x.caption)+'</textarea></div>'+
+      '<div class="fld"><label>🅰️ On-creative copy</label><textarea class="copy">'+esc(x.copy)+'</textarea></div></div>'+
+    slots(x)+
+    '<div class="r2"><div class="fld"><label>Replication stage</label><select class="replicated">'+so()+'</select></div>'+
+      '<div class="fld"><label>Feedback — outcome &amp; learning</label><textarea class="feedback">'+esc(x.feedback)+'</textarea></div></div>'+
+    '<div class="acts"><button class="btn save">Save</button><button class="btn rm">Remove</button>'+
+      '<span class="by">'+(x.designer?("→ "+esc(x.designer)+" · "):"")+(x.by?("by "+esc(x.by)):"")+(x.at?(" · "+esc(x.at)):"")+'</span>'+
+      '<input type="file" accept="image/*" class="upfile" hidden></div></div>';
 }
+function collect(c){var o=DATA[c.getAttribute("data-k")]||{ckey:c.getAttribute("data-k")};
+  ["campaign","designer","priority","replicated","objective","reason","caption","copy","feedback"].forEach(function(f){var el=c.querySelector("."+f);if(el)o[f]=el.value;});
+  o.kind="shortlist";o.ckey=c.getAttribute("data-k");o.by=o.by||nm();DATA[o.ckey]=o;return o;}
+function post(o,btn){if(btn)btn.textContent="Saving…";
+  return fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)}).then(function(r){return r.json();})
+   .then(function(j){if(j&&j.error){alert("Save failed: "+j.error);if(btn)btn.textContent="Save";return j;}if(btn){btn.textContent="Saved ✓";setTimeout(function(){btn.textContent="Save";},1100);}return j;})
+   .catch(function(){if(btn)btn.textContent="Retry";});}
+function compress(file,cb){var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var max=1600,w=img.width,h=img.height;if(Math.max(w,h)>max){var s=max/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}var cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0,w,h);try{cb(cv.toDataURL("image/jpeg",0.85).split(",")[1]);}catch(e){cb(null);}};img.onerror=function(){cb(null);};img.src=rd.result;};rd.onerror=function(){cb(null);};rd.readAsDataURL(file);}
 function bind(){
   document.querySelectorAll(".card").forEach(function(c){
-    var k=c.getAttribute("data-k");
-    var file=c.querySelector(".upfile");
-    function pickUpload(){file.click();}
-    c.querySelector(".up").addEventListener("click",pickUpload);
-    var drop=c.querySelector("[data-up]");if(drop)drop.addEventListener("click",pickUpload);
-    file.addEventListener("change",function(){
-      var f=file.files[0];if(!f)return;
-      if(!BACKEND){alert("Connect the shared backend first to store uploads.");return;}
-      var box=c.querySelector("[data-up]");if(box){box.classList.add("busy");box.innerHTML="uploading…";}
-      var rd=new FileReader();
-      rd.onload=function(){
-        var b64=(rd.result+"").split(",")[1];
-        var o=DATA[k]||{};
-        var camp=(c.querySelector(".campaign")?c.querySelector(".campaign").value:(o.campaign||""));
-        upload({kind:"upload",ckey:k,name:f.name,mime:f.type||"image/png",data:b64,
-                brand:o.brand,media:o.media,cat:o.cat,campaign:camp,link:o.link,img:o.img,by:who()});
-      };
-      rd.readAsDataURL(f);
-    });
-    c.querySelector(".save").addEventListener("click",function(){
-      var o=DATA[k]||{ckey:k}; o.reason=c.querySelector(".reason").value; o.usage=c.querySelector(".usage").value; o.replicated=c.querySelector(".replicated").value; o.campaign=c.querySelector(".campaign").value; o.kind="shortlist"; o.ckey=k; DATA[k]=o;
-      post(o,c.querySelector(".save"));
-    });
-    c.querySelector(".rm").addEventListener("click",function(){
-      post({kind:"shortlist",ckey:k,remove:true}); delete DATA[k]; render();
-    });
+    var k=c.getAttribute("data-k"),file=c.querySelector(".upfile"),pendingSlot="sq";
+    c.querySelector(".save").addEventListener("click",function(){post(collect(c),c.querySelector(".save"));});
+    c.querySelector(".rm").addEventListener("click",function(){post({kind:"shortlist",ckey:k,remove:true});delete DATA[k];render();});
+    c.querySelectorAll("button.up").forEach(function(b){b.addEventListener("click",function(){pendingSlot=b.getAttribute("data-slot");file.click();});});
+    c.querySelectorAll("button.lk").forEach(function(b){b.addEventListener("click",function(){var slot=b.getAttribute("data-slot");var cur=assetsOf(DATA[k]||{});var url=prompt("Paste a link for "+slot+":",cur[slot]&&/^https?:/.test(cur[slot])?cur[slot]:"");if(url===null)return;var o=collect(c);var a=assetsOf(o);if(url.trim()){a[slot]=url.trim();}else{delete a[slot];}o.assets=JSON.stringify(a);DATA[k]=o;post(o).then(function(){render();});});});
+    file.addEventListener("change",function(){var f=file.files[0];if(!f)return;var o=collect(c);compress(f,function(b64){if(!b64){alert("Could not read image.");return;}
+      post({kind:"upload",ckey:k,slot:pendingSlot,name:"reia.jpg",mime:"image/jpeg",data:b64,brand:o.brand,media:o.media,cat:o.cat,campaign:o.campaign,designer:o.designer,priority:o.priority,link:o.link,img:o.img,by:nm()}).then(function(j){if(j&&j.assets){DATA[k].assets=j.assets;DATA[k].our_creative=j.url;if((DATA[k].replicated||"no")==="no")DATA[k].replicated="in-progress";render();}else{alert("Upload failed: "+((j&&j.error)||"unknown"));}});});});
   });
 }
-function who(){var n=localStorage.getItem("reiaReviewer");if(!n){n=prompt("Your name (so the team sees who replicated it, e.g. Réia):")||"";if(n){localStorage.setItem("reiaReviewer",n);}}return n;}
-function post(o,btn){if(btn){btn.textContent="Saving…";}
-  fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)}).then(function(){if(btn){btn.textContent="Saved ✓";setTimeout(function(){btn.textContent="Save";},1200);}}).catch(function(){if(btn){btn.textContent="Save (retry)";}});
-}
-function upload(o){
-  fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)})
-    .then(function(r){return r.json();})
-    .then(function(j){ if(j&&j.url){ DATA[o.ckey]=DATA[o.ckey]||{ckey:o.ckey,brand:o.brand,media:o.media,cat:o.cat,link:o.link,img:o.img}; DATA[o.ckey].our_creative=j.url; if(o.campaign)DATA[o.ckey].campaign=o.campaign; if((DATA[o.ckey].replicated||"no")==="no")DATA[o.ckey].replicated="in-progress"; render(); }
-                       else { load(); } })
-    .catch(function(){ alert("Upload failed — please retry."); load(); });
-}
 document.querySelectorAll(".chip").forEach(function(c){c.addEventListener("click",function(){document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});c.classList.add("on");FILTER=c.getAttribute("data-f");render();});});
-document.getElementById("campfilter").addEventListener("change",function(){CAMPFILTER=this.value;render();});
+document.getElementById("fcamp").addEventListener("change",function(){FCAMP=this.value;render();});
+document.getElementById("fdz").addEventListener("change",function(){FDZ=this.value;render();});
+document.getElementById("fpr").addEventListener("change",function(){FPR=this.value;render();});
 load();
 </script>
 </body></html>
-<!-- tail-guard 1 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 2 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 3 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 4 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 5 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 6 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 7 (after </html>, truncation here is harmless) -->
-<!-- tail-guard 8 (after </html>, truncation here is harmless) -->
+<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->
