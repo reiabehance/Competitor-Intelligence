@@ -1,0 +1,139 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Réia — Designer Worklist</title>
+<script src="config.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@400;500;600&family=Lora&display=swap');
+:root{--maroon:#7B0017;--ink:#15150e;--line:#e6dccb;--gold:#b78b2e;--win:#3f8f4f;--prog:#b78b2e;--paper:#f3ecdf;}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Lora',Georgia,serif;}
+.top{background:var(--maroon);color:#fff;padding:18px 26px;box-shadow:0 2px 12px rgba(0,0,0,.18);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.top .tt{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;}
+.top a{color:#ffd9a8;font-family:'Poppins',sans-serif;font-size:.78rem;text-decoration:none;margin-left:14px;}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 18px 80px;}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 14px;font-family:'Poppins',sans-serif;font-size:.72rem;}
+.chip{background:#faf4ea;border:1px solid var(--line);border-radius:18px;padding:6px 13px;cursor:pointer;color:#6b5f54;}
+.chip.on{background:var(--maroon);color:#fff;border-color:var(--maroon);}
+.muted{color:#8a7c6c;}
+select{font-family:'Poppins',sans-serif;font-size:.72rem;border:1px solid var(--line);border-radius:8px;padding:6px 9px;background:#fffdf8;color:var(--ink);}
+.btn{font-family:'Poppins',sans-serif;font-size:.72rem;font-weight:600;border:none;border-radius:18px;padding:7px 14px;cursor:pointer;background:var(--gold);color:#1a1a12;}
+.btn.alt{background:#faf4ea;color:var(--maroon);border:1px solid var(--line);}
+.grp{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--maroon);border-bottom:2px solid #e6cf9a;padding:16px 0 5px;margin-top:14px;display:flex;align-items:center;gap:8px;}
+.grp .gn{font-family:'Poppins',sans-serif;font-size:.6rem;font-weight:600;color:#fff;background:var(--gold);border-radius:10px;padding:1px 8px;}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:8px;font-family:'Poppins',sans-serif;font-size:.74rem;}
+th{background:#f3e9d6;color:#6b5f54;text-align:left;font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--line);}
+td{padding:9px 10px;border-bottom:1px solid #f0e8da;vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.thumb{width:46px;height:46px;object-fit:cover;border-radius:7px;border:1px solid var(--line);display:block;}
+.nothumb{width:46px;height:46px;border-radius:7px;border:1px dashed var(--line);}
+.bd{font-family:'Lora',serif;font-size:.82rem;color:var(--ink);max-width:260px;}
+.use{font-family:'Lora',serif;font-size:.8rem;color:#5a4d44;max-width:240px;}
+.brand{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:var(--maroon);}
+.mb{font-size:.54rem;font-weight:700;padding:2px 6px;border-radius:7px;color:#fff;}
+.mb-r{background:#7B0017;}.mb-s{background:#2f4d7a;}
+.stg{font-size:.56rem;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;white-space:nowrap;}
+.stg-no{background:#9a8f80;}.stg-in{background:var(--prog);}.stg-done{background:var(--win);}
+.lnk{color:#2f4d7a;text-decoration:none;font-weight:600;}
+.empty{text-align:center;color:#8a7c6c;font-family:'Poppins',sans-serif;padding:50px 10px;}
+.setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
+@media print{.bar,.top a{display:none;}body{background:#fff;}.thumb,.nothumb{display:none;}.btn{display:none;}}
+</style></head><body>
+<div class="top"><div class="tt">RÉIA — Designer Worklist</div><div><a href="index.html">← Archive hub</a><a href="shortlist.html">★ Finalised &amp; replication</a></div></div>
+<div class="wrap">
+<div class="bar">
+  <span class="chip on" data-f="todo">To do</span>
+  <span class="chip" data-f="no">To replicate</span>
+  <span class="chip" data-f="in-progress">Replicating</span>
+  <span class="chip" data-f="done">Replicated ✓</span>
+  <span class="chip" data-f="all">All</span>
+  <span class="muted" style="margin-left:6px;">Campaign:</span>
+  <select id="campfilter"><option value="all">All campaigns</option></select>
+  <button class="btn" id="csv">⬇ Download CSV</button>
+  <button class="btn alt" id="print">🖨 Print / PDF</button>
+  <span id="count" class="muted" style="margin-left:auto;"></span>
+</div>
+<div id="list"></div>
+</div>
+<script>
+var BACKEND=(window.REIA_BACKEND||"").trim();
+var FILTER="todo", CAMPFILTER="all", DATA={};
+function esc(s){return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function isReel(x){return (x.media||"").toLowerCase().indexOf("reel")>-1;}
+function campOf(x){return (x.campaign&&(""+x.campaign).trim())?(""+x.campaign).trim():"Unassigned";}
+function stg(r){r=r||"no";return r==="done"?'<span class="stg stg-done">Replicated ✓</span>':(r==="in-progress"?'<span class="stg stg-in">Replicating</span>':'<span class="stg stg-no">To replicate</span>');}
+function passFilter(x){
+  var r=x.replicated||"no";
+  if(FILTER==="todo")return r!=="done";
+  if(FILTER==="all")return true;
+  return r===FILTER;
+}
+function selected(){
+  return Object.keys(DATA).map(function(k){return DATA[k];})
+    .filter(passFilter)
+    .filter(function(x){return CAMPFILTER==="all"||campOf(x)===CAMPFILTER;})
+    .sort(function(p,q){return campOf(p).localeCompare(campOf(q))||(p.brand||"").localeCompare(q.brand||"");});
+}
+function load(){
+  if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Shared backend not connected yet.</b><br>Connect the Google Sheet web app (see <i>backend_apps_script.gs</i>) and paste its URL into <code>config/page_urls.json → backend_url</code>. Then this worklist fills automatically from everything the team has finalised.</div>';return;}
+  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store. Check the backend URL.</div>';});
+}
+function render(){
+  var all=Object.keys(DATA).map(function(k){return DATA[k];});
+  var camps={};all.forEach(function(x){camps[campOf(x)]=(camps[campOf(x)]||0)+1;});
+  var names=Object.keys(camps).sort(function(a,b){return a==="Unassigned"?1:(b==="Unassigned"?-1:a.localeCompare(b));});
+  var sel=document.getElementById("campfilter");
+  sel.innerHTML='<option value="all">All campaigns</option>'+names.map(function(n){return '<option value="'+esc(n)+'"'+(CAMPFILTER===n?' selected':'')+'>'+esc(n)+' ('+camps[n]+')</option>';}).join("");
+  if(CAMPFILTER!=="all"&&!camps[CAMPFILTER])CAMPFILTER="all";
+  var items=selected();
+  document.getElementById("count").textContent=items.length+" creative"+(items.length===1?"":"s")+" to build";
+  var L=document.getElementById("list");
+  if(!items.length){L.innerHTML='<div class="empty">Nothing in this view. Tag campaigns and stages on the Finalised &amp; Replication tab.</div>';return;}
+  var html="",curg=null;
+  items.forEach(function(x){
+    var g=campOf(x);
+    if(g!==curg){
+      if(curg!==null)html+='</tbody></table>';
+      curg=g;var cnt=items.filter(function(y){return campOf(y)===g;}).length;
+      html+='<div class="grp">🏷 '+esc(g)+' <span class="gn">'+cnt+'</span></div>';
+      html+='<table><thead><tr><th>Ref</th><th>Brand</th><th>Type</th><th>Category</th><th>Stage</th><th>What to replicate (brief)</th><th>How we\'ll use it for Réia</th><th>Links</th></tr></thead><tbody>';
+    }
+    var th=x.img?('<img class="thumb" src="'+esc(x.img)+'" referrerpolicy="no-referrer">'):'<div class="nothumb"></div>';
+    var ours=x.our_creative?(' · <a class="lnk" href="'+esc(x.our_creative)+'" target="_blank" rel="noopener">our asset ↗</a>'):'';
+    html+='<tr><td>'+th+'</td><td><span class="brand">'+esc(x.brand)+'</span></td>'+
+      '<td>'+(isReel(x)?'<span class="mb mb-r">REEL</span>':'<span class="mb mb-s">STATIC</span>')+'</td>'+
+      '<td>'+esc(x.cat)+'</td><td>'+stg(x.replicated)+'</td>'+
+      '<td class="bd">'+(esc(x.reason)||'<span class="muted">—</span>')+'</td>'+
+      '<td class="use">'+(esc(x.usage)||'<span class="muted">—</span>')+'</td>'+
+      '<td><a class="lnk" href="'+esc(x.link)+'" target="_blank" rel="noopener">original ↗</a>'+ours+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  L.innerHTML=html;
+}
+function csvCell(s){s=(s==null?"":""+s);return '"'+s.replace(/"/g,'""').replace(/\r?\n/g," ")+'"';}
+function downloadCSV(){
+  var items=selected();
+  var head=["Campaign","Brand","Type","Category","Stage","What to replicate","How we'll use it for Reia","Original ad URL","Our creative URL","Finalised by","Updated"];
+  var rows=[head.map(csvCell).join(",")];
+  items.forEach(function(x){
+    rows.push([campOf(x),x.brand,(isReel(x)?"Reel":"Static"),x.cat,
+      ((x.replicated||"no")==="done"?"Replicated":((x.replicated==="in-progress")?"Replicating":"To replicate")),
+      x.reason,x.usage,x.link,(x.our_creative||""),(x.by||""),(x.at||"")].map(csvCell).join(","));
+  });
+  var blob=new Blob(["﻿"+rows.join("\r\n")],{type:"text/csv;charset=utf-8;"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  var tag=(CAMPFILTER==="all"?"all-campaigns":CAMPFILTER.replace(/[^a-z0-9]+/gi,"-").toLowerCase());
+  a.download="reia-designer-worklist_"+tag+"_"+new Date().toISOString().slice(0,10)+".csv";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+document.querySelectorAll(".chip").forEach(function(c){c.addEventListener("click",function(){document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});c.classList.add("on");FILTER=c.getAttribute("data-f");render();});});
+document.getElementById("campfilter").addEventListener("change",function(){CAMPFILTER=this.value;render();});
+document.getElementById("csv").addEventListener("click",downloadCSV);
+document.getElementById("print").addEventListener("click",function(){window.print();});
+load();
+</script>
+<!-- pad 1 guard against OneDrive tail truncation -->
+<!-- pad 2 guard against OneDrive tail truncation -->
+<!-- pad 3 guard against OneDrive tail truncation -->
+<!-- pad 4 guard against OneDrive tail truncation -->
+<!-- pad 5 guard against OneDrive tail truncation -->
+<!-- pad 6 guard against OneDrive tail truncation -->
+</body></html>

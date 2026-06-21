@@ -9,6 +9,14 @@ os.makedirs(VERS,exist_ok=True); os.makedirs(MON,exist_ok=True)
 BREAK=BASE+"/reports/Reia-Competitor-Creative-Breakdown.html"
 BRIEF=BASE+"/reports/Reia-WEEKLY-Decision-Brief.html"
 stats=json.load(open(BASE+"/data/assets/stats6.json"))
+# shared backend URL -> write config.js + publish the Shortlist tab into share/
+try: _BU=(json.load(open(BASE+"/page_urls.json")).get("backend_url") or "").strip()
+except Exception: _BU=""
+open(SHARE+"/config.js","w",encoding="utf-8").write('window.REIA_BACKEND="%s";'%_BU)
+if os.path.exists(BASE+"/shortlist.html"): shutil.copy(BASE+"/shortlist.html", SHARE+"/shortlist.html")
+if os.path.exists(BASE+"/review.html"): shutil.copy(BASE+"/review.html", SHARE+"/review.html")
+if os.path.exists(BASE+"/worklist.html"): shutil.copy(BASE+"/worklist.html", SHARE+"/worklist.html")
+if os.path.exists(BASE+"/data/assets/creatives.json"): shutil.copy(BASE+"/data/assets/creatives.json", SHARE+"/creatives.json")
 now=datetime.datetime.now()
 stamp=now.strftime("%Y-%m-%d_%H%M"); ym=now.strftime("%Y-%m"); nice=now.strftime("%d %b %Y, %H:%M")
 monthname=now.strftime("%B %Y")
@@ -74,7 +82,10 @@ B=[]
 B.append('<div class="top"><div class="ts">Weekly Competitor Creative Intelligence · version history</div><div class="tt">RÉIA — Competitor Intelligence Archive</div></div><div class="wrap">')
 _lbrief=(f'<a class="btn" style="background:rgba(255,255,255,.16);color:#fff" href="versions/{latest["stamp"]}/decision-brief.html">Decision brief →</a>' if latest.get("has_brief") else '')
 B.append(f'<div class="latest"><div class="lab">Latest snapshot</div><h2>{html.escape(latest["nice"])}</h2>{kpis(latest)}'
-         f'<div><a class="btn" href="versions/{latest["stamp"]}/index.html">Open the breakdown →</a> {_lbrief}</div></div>')
+         f'<div><a class="btn" href="versions/{latest["stamp"]}/index.html">Open the breakdown →</a> {_lbrief} '
+         f'<a class="btn" style="background:#1f8a4c;color:#fff" href="review.html">🔔 To review →</a> '
+         f'<a class="btn" style="background:#b78b2e;color:#1a1a12" href="shortlist.html">★ Finalised &amp; replication →</a> '
+         f'<a class="btn" style="background:#2f4d7a;color:#fff" href="worklist.html">🎨 Designer worklist →</a></div></div>')
 for monthname,items in by.items():
     ymv=items[0]["ym"]
     B.append(f'<h2 class="mh">{html.escape(monthname)} <span class="monthlink"><a style="color:#8a7c6c" href="monthly/{ymv}/index.html">month\'s latest →</a></span></h2><div class="grid">')
@@ -83,9 +94,13 @@ for monthname,items in by.items():
         B.append(f'<div class="card"><div class="d">{html.escape(m["nice"])}</div>'
                  f'<div class="s"><i>{m["unique"]:,} placements</i><i>{m["brands"]} brands</i><i class="w">{m["winning"]:,} win</i><i class="l">{m["losing"]:,} short</i><i class="n">{m["newly"]:,} new</i></div>'
                  f'<div class="links"><a href="versions/{m["stamp"]}/index.html">Breakdown</a>{briefl}</div></div>')
-    B.append('</div>')
-B.append(f'<div class="foot">{len(man)} versions archived · each snapshot is frozen at capture time. Monthly folders hold the final state of each month. EF/VVS floor applies to all Réia creative.</div></div>')
-OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><title>Réia — Competitor Intelligence Archive</title><style>"+CSS+"</style></head><body>"+''.join(B)+"</body></html>"
+B.append(f'<div class="foot">{len(man)} versions archived. Each snapshot is frozen at capture time; monthly folders hold the final state of each month. EF/VVS floor applies to all Reia creative.</div></div>')
+OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><title>Reia Competitor Intelligence Archive</title><style>"+CSS+"</style></head><body>"+''.join(B)+"</body></html>"
 open(SHARE+"/index.html","w",encoding="utf-8").write(OUT)
-print("Saved version",stamp,"| month",ym,"| total versions:",len(man))
-print("Hub:",len(OUT),"chars")
+print("HUB wrote",len(man),"versions; config.js backend=",("set" if _BU else "EMPTY"))
+# padding 1 — guards file tail against OneDrive sync truncation
+# padding 2 — guards file tail against OneDrive sync truncation
+# padding 3 — guards file tail against OneDrive sync truncation
+# padding 4 — guards file tail against OneDrive sync truncation
+# padding 5 — guards file tail against OneDrive sync truncation
+# padding 6 — guards file tail against OneDrive sync truncation

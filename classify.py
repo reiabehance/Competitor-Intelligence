@@ -5,7 +5,14 @@ from collections import defaultdict, Counter
 import os
 BASE=os.environ.get("REPO_ROOT", os.path.dirname(os.path.abspath(__file__)))
 today=date.today()
+TODAY=today.isoformat()
 MIN_ADS=4
+# collation map (stable creative id) + the append-only "seen" ledger for NEW / weeks-running tracking
+try: COLL=json.load(open(BASE+"/data/assets/collation_map.json"))
+except Exception: COLL={}
+try: SEEN=json.load(open(BASE+"/data/seen.json"))
+except Exception: SEEN={}
+PREV_KEYS=set(SEEN.keys())   # which creatives existed BEFORE this run -> anything not here is NEW
 
 def days(s):
     try:
@@ -167,6 +174,20 @@ for x in rows:
     x["media"]="Reel" if (x.get("hasvid")=="1" or x["fmt"]=="VIDEO") else "Static"
     x["status"]=("Winning" if dd>=14 else "Losing" if dd>=7 else "Newly") if dd is not None else "?"
     x["cat"]=category(x["copy"],x["title"],x["fmt"])
+    x["ckey"]=str(COLL.get(x["link"]) or x["link"])     # stable creative id (review/save key, survives weekly runs)
+# --- update the append-only seen ledger: first-seen date + how many runs each creative has appeared in ---
+for x in rows:
+    if x["status"]=="?": continue
+    k=x["ckey"]
+    if k in SEEN:
+        if SEEN[k].get("last")!=TODAY: SEEN[k]["runs"]=SEEN[k].get("runs",1)+1
+        SEEN[k]["last"]=TODAY
+    else:
+        SEEN[k]={"first":TODAY,"last":TODAY,"runs":1}
+    x["new"]=(k not in PREV_KEYS)                         # first appearance ever = NEW this week
+    x["weeks"]=SEEN[k]["runs"]; x["first"]=SEEN[k]["first"]
+try: json.dump(SEEN, open(BASE+"/data/seen.json","w"))
+except Exception as _se: print("seen ledger save skipped:",_se)
 
 # brand totals, keep >=MIN_ADS OR any tracked brand (in page_urls.json / hardcoded)
 bc=Counter(x["brand"] for x in rows if x["status"]!="?")
@@ -184,7 +205,8 @@ order=sorted(keep, key=lambda b:(seg(b)[0], -bc[b]))
 brk={}; insight={}; meta={}
 for b in order:
     v=buckets[b]
-    brk[b]={k:[{"cat":a["cat"],"dd":a["dd"],"fmt":a["fmt"],"copy":(a["title"] or a["copy"])[:150],"link":a["link"]}
+    brk[b]={k:[{"cat":a["cat"],"dd":a["dd"],"fmt":a["fmt"],"copy":(a["title"] or a["copy"])[:150],"link":a["link"],
+                "ckey":a.get("ckey",a["link"]),"new":a.get("new",False),"weeks":a.get("weeks",1),"first":a.get("first","")}
               for a in sorted(v[k],key=lambda a:-(a["dd"] if a["dd"] is not None else 0))] for k in KEYS}
     g,tc,tt=seg(b); _bi=BRANDINFO.get(b,{})
     meta[b]={"group":g,"tag":tc,"tagtext":tt,"total":bc[b],"page_id":_bi.get("page_id",""),"country":_bi.get("country","ALL")}
@@ -238,17 +260,4 @@ except Exception as _pe:
 # padding line 24 — guards the file tail against OneDrive sync truncation; safe to ignore
 # padding line 25 — guards the file tail against OneDrive sync truncation; safe to ignore
 # padding line 26 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 27 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 28 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 29 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 30 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 31 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 32 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 33 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 34 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 35 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 36 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 37 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 38 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 39 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 40 — guards the file tail against OneDrive sync truncation; safe to ignore
+# padding lin

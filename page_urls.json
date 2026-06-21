@@ -1,6 +1,8 @@
 {
-  "note": "All brand Facebook page IDs for the weekly page-scoped scrape. Build URLs via url_template (substitute COUNTRY + PAGE_ID). Run limitPerSource 200, activeStatus=active, sortBy=impressions_desc. Actor returns collation_id — dedupe creatives by it.",
+  "note": "All brand Facebook page IDs for the weekly page-scoped scrape. Build URLs via url_template (substitute COUNTRY + PAGE_ID). Direct/self at full coverage, rest capped. Actor returns collation_id — dedupe creatives by it.",
   "url_template": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country={COUNTRY}&search_type=page&sort_data[direction]=desc&sort_data[mode]=total_impressions&view_all_page_id={PAGE_ID}",
+  "backend_url": "https://script.google.com/macros/s/AKfycbxcZtTzHBGYFAqElMoQJO-v6kylpS423bA9aup0t5GA_rNh9UBB2IwLrBYO8B5GIQc-vw/exec",
+  "backend_url_note": "Google Apps Script web app (reviews + shortlist + uploads). Powers the shared To-Review / Finalised / Worklist tabs.",
   "email_recipients": [
     "Prapanjj@reia.diamonds",
     "Jacob@reia.diamonds",
@@ -357,6 +359,6 @@
     "Armani",
     "Converse"
   ],
-  "live_url": "",
-  "live_url_note": "After first Netlify deploy, paste the hub URL here so the weekly task can verify the live link is fresh."
+  "live_url": "https://reiabehance.github.io/Competitor-Intelligence/",
+  "live_url_note": "GitHub Pages hub. Used by the weekly task to verify the live link is fresh."
 }

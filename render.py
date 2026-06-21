@@ -37,6 +37,24 @@ TWIST={
 COLLATION={}
 try: COLLATION=json.load(open(A+"collation_map.json"))
 except: pass
+NEW_IDS=set()
+try: NEW_IDS=set(str(x) for x in json.load(open(A+"new_ids.json")))
+except: pass
+try: REVIEW_API=(json.load(open(BASE+"/page_urls.json")).get("review_api_url") or "")
+except: REVIEW_API=""
+def _isnew(link):
+    return str(COLLATION.get(link) or link) in NEW_IDS
+NEWIDS=set()
+try: NEWIDS=set(json.load(open(A+"new_ids.json")))
+except: pass
+REVIEWS={}
+try: REVIEWS=json.load(open(BASE+"/reviews.json"))
+except: pass
+BACKEND=""
+try: BACKEND=(json.load(open(BASE+"/page_urls.json")).get("backend_url") or "").strip()
+except: pass
+CREATIVES={}
+def rid(a): return str(COLLATION.get(a["link"]) or a["link"])
 def chip(c): return f'<span class="cat" style="background:{CATCOL.get(c,"#777")}">{html.escape(c)}</span>'
 def imgtag(u,extra=""): return f'<img class="lz" data-src="{html.escape(u)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt=""{extra}>'
 def ckey(a):
@@ -67,15 +85,29 @@ def brand_uniq(b):
     allads=[]
     for k in ["WR","WS","LR","LS","NR","NS"]:
         st,med=BKT[k]
-        for a in brk[b][k]: allads.append({**a,"_st":st,"_med":med})
+        for a in brk[b][k]: allads.append({**a,"_st":st,"_med":med,"_brand":b})
     return dedupe(allads)
 def _nbadge(a): return f'<span class="ntag" title="Same creative running as {a["_n"]} ad placements">x{a["_n"]}</span>' if a.get("_n",1)>1 else ''
 def thumb(a,big=False):
     u=IMG.get(a["link"]); m=a.get("_med") or ("Reel" if a.get("fmt")=="VIDEO" else "Static")
+    _rid=rid(a); isnew="1" if a.get("new") else ""
+    rv=REVIEWS.get(_rid) or {}; rvd="1" if rv.get("reviewed") else ""; cons=rv.get("considered") or ""
     cls="th big" if big else "th"
+    if isnew: cls+=" is-new"
+    if cons=="yes": cls+=" rv-yes"
+    elif cons=="no": cls+=" rv-no"
     inner=imgtag(u) if u else '<div class="noimg">no preview</div>'
-    return (f'<a class="{cls}" href="{html.escape(a["link"])}" target="_blank" rel="noopener" title="{html.escape((a.get("cat") or "")+" · "+(a.get("copy") or ""))}">'
-            f'{inner}<span class="thm">{m[0]}</span>{_nbadge(a)}<span class="thd">{a.get("dd","?")}d</span></a>')
+    star=(f'<span class="star" data-rid="{html.escape(_rid)}" data-link="{html.escape(a["link"])}" data-brand="{html.escape(a.get("_brand",""))}"'
+          f' data-cat="{html.escape(a.get("cat",""))}" data-media="{html.escape(m)}" data-img="{html.escape(u or "")}" title="Shortlist this creative to replicate">★</span>')
+    _bn=a.get("_brand","")
+    if _bn and not _bn.lower().replace("é","e").startswith("reia"):
+        CREATIVES[_rid]={"ckey":_rid,"brand":_bn,"media":m,"cat":a.get("cat",""),"link":a["link"],"img":u or "","new":bool(a.get("new"))}
+    newrib='<span class="newrib">NEW</span>' if isnew else ''
+    rvbtn=(f'<span class="rvbtn" data-rid="{html.escape(_rid)}" data-brand="{html.escape(a.get("_brand",""))}"'
+           f' title="Review: click to cycle Unreviewed -> Considered -> Not considered"></span>')
+    return (f'<div class="{cls}" data-rid="{html.escape(_rid)}" data-new="{isnew}" data-reviewed="{rvd}" data-considered="{cons}">'
+            f'{star}{newrib}{rvbtn}<a class="thlink" href="{html.escape(a["link"])}" target="_blank" rel="noopener" title="{html.escape((a.get("cat") or "")+" · "+(a.get("copy") or ""))}">'
+            f'{inner}<span class="thm">{m[0]}</span>{_nbadge(a)}<span class="thd">{a.get("dd","?")}d</span></a></div>')
 
 GN={0:"Réia — your own ads",1:"Direct competitors",2:"Adjacent jewellery (category context)",3:"Creative inspiration — NOT competitors"}
 GSUB={0:"self-audit",1:"India + global lab-grown / custom-engagement brands — your real rivals",2:"natural &amp; gold incumbents — they chase jewellery/wedding spend, not lab-grown engagement",3:"non-jewellery D2C &amp; luxury — we borrow their creative MECHANICS only; NOT competitors"}
@@ -296,7 +328,50 @@ table.mx tr.seg td{background:#2a0a10;color:#fff;padding:9px 14px;border-bottom:
 .thumbs,.gallery{display:flex;flex-wrap:wrap;gap:8px;}
 .th{position:relative;width:104px;height:104px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#efe7d8;text-decoration:none;display:block;flex:none;box-shadow:0 1px 4px rgba(0,0,0,.06);transition:box-shadow .15s,transform .15s;}
 .th:hover{box-shadow:0 8px 20px rgba(0,0,0,.2);transform:translateY(-2px);}
+.th .thlink{display:block;width:100%;height:100%;text-decoration:none;}
 .th img{width:100%;height:100%;object-fit:cover;display:block;}
+.star{position:absolute;top:5px;left:5px;z-index:6;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:rgba(21,21,14,.55);color:#fff;font-size:.8rem;cursor:pointer;user-select:none;transition:transform .1s;}
+.star:hover{transform:scale(1.15);}
+.star.on{background:#b78b2e;color:#fff;}
+.newrib{position:absolute;top:5px;right:5px;z-index:6;background:#1f8a4c;color:#fff;font-family:'Poppins',sans-serif;font-size:.54rem;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:7px;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.rvbtn{position:absolute;bottom:5px;right:5px;z-index:6;width:20px;height:20px;line-height:18px;text-align:center;border-radius:50%;border:2px solid #fff;background:rgba(21,21,14,.45);color:#fff;font-size:.7rem;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.rvbtn:hover{transform:scale(1.15);}
+.th.rv-yes .rvbtn{background:#1f8a4c;}.th.rv-yes .rvbtn:after{content:'\2713';}
+.th.rv-no .rvbtn{background:#c0392b;}.th.rv-no .rvbtn:after{content:'\2715';}
+.th.rv-yes{outline:3px solid #1f8a4c;outline-offset:-3px;}
+.th.rv-no{outline:3px solid #c0392b;outline-offset:-3px;opacity:.75;}
+/* review toolbar */
+.reviewbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 16px;margin:10px 0 4px;box-shadow:0 2px 8px rgba(0,0,0,.05);font-family:'Poppins',sans-serif;font-size:.74rem;}
+.reviewbar .rlab{color:#6b5f54;font-weight:500;}
+#reviewer{font-family:'Poppins',sans-serif;font-size:.78rem;padding:6px 12px;border:1px solid var(--line);border-radius:18px;outline:none;width:150px;}
+#reviewer:focus{border-color:var(--maroon);}
+.rfilters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.rf{cursor:pointer;color:#6b5f54;background:#faf4ea;border:1px solid var(--line);border-radius:16px;padding:5px 11px;}
+.rf.on{background:var(--maroon);color:#fff;border-color:var(--maroon);}
+#exportrev{cursor:pointer;background:#2f5d2f;color:#fff;border:none;border-radius:18px;padding:7px 14px;font-family:'Poppins',sans-serif;font-size:.72rem;font-weight:600;}
+.reviewbar .rcount{color:#8a7c6c;}
+body.flt-new .th:not(.is-new){display:none;}
+body.flt-unrev .th[data-reviewed="1"]{display:none;}
+body.flt-rev .th:not([data-reviewed="1"]){display:none;}
+body.flt-saved .th:not(.saved){display:none;}
+#savedbtn{position:fixed;right:18px;bottom:18px;z-index:90;background:var(--maroon);color:#fff;font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:600;padding:11px 18px;border-radius:26px;box-shadow:0 6px 20px rgba(123,0,23,.35);cursor:pointer;}
+#savedpanel{position:fixed;right:18px;bottom:64px;z-index:91;width:340px;max-height:70vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.25);display:none;padding:10px;}
+#savedpanel.open{display:block;}
+.sph{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--maroon);display:flex;justify-content:space-between;align-items:center;padding:4px 6px 10px;border-bottom:1px solid var(--line);}
+#savedclose{cursor:pointer;color:#8a7c6c;font-size:1rem;}
+.sitem{display:flex;gap:10px;align-items:center;padding:8px 6px;border-bottom:1px solid #f0e8d9;}
+.sitem img{width:52px;height:52px;object-fit:cover;border-radius:8px;flex:none;border:1px solid var(--line);}
+.sitem .si{flex:1;font-family:'Poppins',sans-serif;font-size:.72rem;}
+.sitem .si b{display:block;color:var(--ink);}.sitem .si span{color:#8a7c6c;}
+.sitem a{font-size:.68rem;color:#2f4d7a;text-decoration:none;}
+.sitem .rm{cursor:pointer;color:#c47d2a;font-size:.9rem;}
+.sempty{font-family:'Poppins',sans-serif;font-size:.74rem;color:#8a7c6c;padding:14px 6px;}
+.schips{display:flex;gap:6px;padding:8px 4px;position:sticky;top:0;background:#fff;}
+.schip{font-family:'Poppins',sans-serif;font-size:.66rem;font-weight:500;color:#6b5f54;background:#faf4ea;border:1px solid var(--line);border-radius:16px;padding:5px 11px;cursor:pointer;}
+.schip.on{background:var(--maroon);color:#fff;border-color:var(--maroon);}
+.sgh{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:var(--maroon);padding:9px 6px 3px;border-bottom:1px solid #f0e8d9;}
+.si .mb-r,.si .mb-s{font-family:'Poppins',sans-serif;font-size:.56rem;font-weight:700;padding:1px 6px;border-radius:8px;margin-right:6px;}
+.si .mb-r{background:#7B0017;color:#fff;}.si .mb-s{background:#2f4d7a;color:#fff;}
 .th img.lz{opacity:0;transition:opacity .35s;background:#efe7d8;}
 .th img.lz.ld{opacity:1;}
 .th .noimg{display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Poppins',sans-serif;font-size:.58rem;color:#a89a88;text-align:center;padding:4px;}
@@ -329,6 +404,8 @@ table.per td{border:1px solid var(--line);padding:8px 11px;vertical-align:top;}
 CSS=CSS.replace("#cdбcaa","#cdbcaa")
 nav='<a href="#vsfield">Réia vs field</a> <a href="#overview">Overview</a> '+' '.join(f'<a href="#{aid(b)}">{html.escape(b.split(" (")[0])}</a>' for b in order)+' <a href="#recos">★ Recos</a>'
 B=[]
+B.append('<a id="reviewbtn" href="review.html" style="text-decoration:none;position:fixed;right:18px;bottom:64px;z-index:90;background:#1f8a4c;color:#fff;font-family:\'Poppins\',sans-serif;font-size:.8rem;font-weight:600;padding:11px 18px;border-radius:26px;box-shadow:0 6px 20px rgba(31,138,76,.35);">🔔 To review <span id="reviewn">0</span></a>')
+B.append('<a id="savedbtn" href="shortlist.html" style="text-decoration:none">★ Finalised &amp; replication <span id="savedn">0</span></a>')
 B.append('<div class="top"><div class="tt">RÉIA · Competitor &amp; Category Creative Intelligence</div><div class="nav">'+nav+'</div></div><div class="wrap">')
 B.append(f'<div class="hero"><div class="k">Holistic creative breakdown · {stats["brands"]} brands · 12 June 2026</div><h1>Where Réia stands — and what every brand is winning on</h1><div class="sub">Read it top to bottom: how you compare, the full brand matrix, then each brand\'s winning creatives with the Réia twist.</div></div>')
 B.append(f'<div class="statrow"><div class="stat"><div class="n">{stats["brands"]}</div><div class="l">Brands tracked</div></div><div class="stat"><div class="n">{stats["unique"]}</div><div class="l">Live placements</div></div><div class="stat s2"><div class="n">{stats["winning"]}</div><div class="l">Winning 2+wk</div></div><div class="stat s4"><div class="n">{stats["losing"]+stats["newly"]}</div><div class="l">Short-run + new</div></div></div>')
@@ -344,46 +421,65 @@ B.append(f'<h2>Personas</h2><table class="per"><tr><td><b>Persona</b></td><td><b
 B.append(f'<div class="foot">{stats["brands"]} brands · {stats["unique"]} live placements · {len(IMG)} thumbnails · creatives de-duplicated via Meta collation_id. Auto-published from GitHub. EF/VVS floor applies to all Réia creative.</div></div>')
 LAZY="<script>(function(){function go(){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var im=e.target;if(im.dataset.src){im.src=im.dataset.src;im.removeAttribute('data-src');im.addEventListener('load',function(){im.classList.add('ld');});im.addEventListener('error',function(){im.classList.add('ld');});}io.unobserve(im);}});},{rootMargin:'900px 0px'});document.querySelectorAll('img.lz[data-src]').forEach(function(im){io.observe(im);});}if('IntersectionObserver' in window){go();}else{document.querySelectorAll('img.lz[data-src]').forEach(function(im){im.src=im.dataset.src;im.classList.add('ld');});}window.addEventListener('beforeprint',function(){document.querySelectorAll('img.lz[data-src]').forEach(function(im){im.src=im.dataset.src;});});})();</script>"
 SEARCH="<script>(function(){var inp=document.getElementById('brandsearch');if(!inp)return;var cnt=document.getElementById('searchcount');function f(){var q=inp.value.trim().toLowerCase();var n=0;document.querySelectorAll('table.mx tbody tr[data-brand]').forEach(function(r){var hit=!q||r.getAttribute('data-brand').indexOf(q)>-1;r.style.display=hit?'':'none';if(hit)n++;});document.querySelectorAll('table.mx tbody tr.seg').forEach(function(s){s.style.display=q?'none':'';});document.querySelectorAll('section.comp[data-brand]').forEach(function(s){s.style.display=(!q||s.getAttribute('data-brand').indexOf(q)>-1)?'':'none';});document.querySelectorAll('.seghead').forEach(function(s){s.style.display=q?'none':'';});cnt.textContent=q?(n+' match'+(n==1?'':'es')):'';}inp.addEventListener('input',f);})();</script>"
-OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><meta name=referrer content=no-referrer><title>Reia Competitor Intelligence</title><style>"+CSS+"</style></head><body>"+''.join(B)+LAZY+SEARCH+"</body></html>"
+SAVED="""<style>
+.th.needs-review{outline:2px solid #b78b2e;outline-offset:1px;animation:reiapulse 1.7s ease-in-out infinite;}
+@keyframes reiapulse{0%,100%{box-shadow:0 0 0 0 rgba(183,139,46,.55);}50%{box-shadow:0 0 0 5px rgba(183,139,46,0);}}
+.star.on{color:#b78b2e;text-shadow:0 0 4px rgba(0,0,0,.5);}
+</style>
+<script>
+(function(){
+var BACKEND=(window.REIA_BACKEND||'').trim();
+var NK='reiaReviewer', LSL='reiaSaved', LRV='reiaReviews';
+var SHORT={}, REV={};
+function esc(s){return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function who(){var n=localStorage.getItem(NK);if(!n){n=prompt('Your name (so the team sees who reviewed / shortlisted it, e.g. Jacob):')||'';if(n){localStorage.setItem(NK,n);}}return n;}
+function lload(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch(e){return {};}}
+function lsave(k,o){localStorage.setItem(k,JSON.stringify(o));}
+function meta(star){return {ckey:star.getAttribute('data-rid'),link:star.getAttribute('data-link'),brand:star.getAttribute('data-brand'),media:star.getAttribute('data-media'),cat:star.getAttribute('data-cat'),img:star.getAttribute('data-img')};}
+function post(o){
+ if(!BACKEND){ // local fallback so it still works before the shared backend is connected
+   if(o.kind==='shortlist'){var s=lload(LSL);if(o.remove){delete s[o.ckey];}else{s[o.ckey]=o;}lsave(LSL,s);}
+   else{var r=lload(LRV);if(o.remove){delete r[o.ckey];}else{r[o.ckey]=o;}lsave(LRV,r);}
+   return;
+ }
+ fetch(BACKEND,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(o)});
+}
+function applyAll(){
+ // stars: gold when shortlisted (shared)
+ document.querySelectorAll('.star').forEach(function(s){s.classList.toggle('on',!!SHORT[s.getAttribute('data-rid')]);});
+ // reviews: conscious — a NEW ad stays flagged 'needs-review' until a human clicks. Rendering never marks it seen.
+ document.querySelectorAll('.rvbtn').forEach(function(b){
+   var th=b.parentNode, id=b.getAttribute('data-rid'), r=REV[id];
+   th.classList.remove('rv-yes','rv-no','needs-review');
+   var st=r&&(r.status||r.considered);
+   if(st==='considered'||st==='yes'){th.classList.add('rv-yes');b.title='Considered for Réia by '+(r.by||'?')+' ('+(r.at||'')+')';}
+   else if(st==='passed'||st==='no'){th.classList.add('rv-no');b.title='Reviewed & passed by '+(r.by||'?')+' ('+(r.at||'')+')';}
+   else{b.title='Conscious review: click = Considered for Réia, again = Passed, again = clear';
+        if(th.getAttribute('data-new')==='1'){th.classList.add('needs-review');}}
+ });
+ var nn=document.querySelectorAll('.th.needs-review').length;
+ var n=document.getElementById('savedn');if(n)n.textContent=Object.keys(SHORT).length;
+ var rn=document.getElementById('reviewn');if(rn)rn.textContent=nn;
+ var rb=document.getElementById('reviewbtn');if(rb)rb.style.display=nn?'':'none';
+}
+function loadAll(){
+ if(!BACKEND){SHORT=lload(LSL);REV=lload(LRV);applyAll();return;}
+ fetch(BACKEND).then(function(r){return r.json();}).then(function(j){SHORT=(j&&j.shortlist)||{};REV=(j&&j.reviews)||{};applyAll();}).catch(function(){SHORT=lload(LSL);REV=lload(LRV);applyAll();});
+}
+// shortlist toggle (★)
+document.addEventListener('click',function(e){var s=e.target.closest&&e.target.closest('.star');if(!s)return;e.preventDefault();e.stopPropagation();var id=s.getAttribute('data-rid');if(SHORT[id]){delete SHORT[id];post({kind:'shortlist',ckey:id,remove:true});}else{var m=meta(s);m.kind='shortlist';m.by=who();m.reason='';m.replicated='no';m.usage='';SHORT[id]=m;post(m);}applyAll();});
+// conscious review cycle (dot): unreviewed -> considered -> passed -> clear
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.rvbtn');if(!b)return;e.preventDefault();e.stopPropagation();var id=b.getAttribute('data-rid');var cur=(REV[id]&&(REV[id].status||REV[id].considered))||'';var nxt=cur===''?'considered':((cur==='considered'||cur==='yes')?'passed':'');if(nxt===''){delete REV[id];post({kind:'review',ckey:id,remove:true});}else{var st=b.parentNode.querySelector('.star');var m=st?meta(st):{ckey:id};m.kind='review';m.status=nxt;m.by=who();m.at=new Date().toISOString().slice(0,10);REV[id]=m;post(m);}applyAll();});
+var up=(location.pathname.indexOf('/versions/')>-1||location.pathname.indexOf('/monthly/')>-1)?'../../':'';
+var sb=document.getElementById('savedbtn');if(sb)sb.setAttribute('href',up+'shortlist.html');
+var rb0=document.getElementById('reviewbtn');if(rb0)rb0.setAttribute('href',up+'review.html');
+loadAll();
+})();
+</script>"""
+REVIEW=""
+BJS='<script>window.REIA_BACKEND="'+BACKEND+'";</script>'
+OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><meta name=referrer content=no-referrer><title>Reia Competitor Intelligence</title>"+BJS+"<style>"+CSS+"</style></head><body>"+''.join(B)+LAZY+SEARCH+SAVED+REVIEW+"</body></html>"
 open(BASE+"/reports/Reia-Competitor-Creative-Breakdown.html","w",encoding="utf-8").write(OUT)
-print("WROTE", len(OUT), "chars")
-# padding line 1 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 2 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 3 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 4 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 5 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 6 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 7 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 8 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 9 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 10 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 11 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 12 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 13 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 14 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 15 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 16 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 17 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 18 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 19 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 20 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 21 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 22 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 23 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 24 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 25 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 26 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 27 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 28 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 29 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 30 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 31 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 32 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 33 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 34 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 35 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 36 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 37 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 38 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 39 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 40 — guards the file tail against OneDrive sync truncation; safe to ignore
+json.dump(sorted(CREATIVES.values(), key=lambda x:(not x["new"], x["brand"])), open(A+"creatives.json","w"))
+print("WROTE",len(OUT),"chars ·",OUT.count('class="star"'),"stars ·",OUT.count('class="rvbtn"'),"review ·",OUT.count('newrib'),"new · creatives.json",len(CREATIVES))
+# padding 1 — guards file tail against O

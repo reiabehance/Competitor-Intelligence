@@ -120,11 +120,31 @@ def extract(items):
                 coll_map[link] = str(it["collation_id"])
     json.dump(img_map, open(os.path.join(ASSETS, "run_img.json"), "w"))
     json.dump(coll_map, open(os.path.join(ASSETS, "collation_map.json"), "w"))
+    # (NEW-this-week detection is handled by update_review_tracking() — collation-based.)
     # static dep needed by render
     src = os.path.join(CFG, "recommendations2.json")
     if os.path.exists(src):
         json.dump(json.load(open(src, encoding="utf-8")), open(os.path.join(ASSETS, "recommendations2.json"), "w"), ensure_ascii=False)
     print(f"Wrote CSV ({rows} rows), {len(img_map)} thumbnails, {len(coll_map)} collation ids.")
+
+def update_review_tracking(items):
+    # rid = a stable creative id (Meta collation_id if present, else the ad link).
+    # seen_ids.json accumulates every creative ever seen -> anything not in it is NEW this run.
+    seen_path = os.path.join(ROOT, "data", "seen_ids.json")
+    try: seen = json.load(open(seen_path))
+    except Exception: seen = {}
+    today = datetime.date.today().isoformat()
+    new_ids = []
+    for it in items:
+        link = it.get("ad_library_url")
+        if not link: continue
+        rid = str(it.get("collation_id") or link)
+        if rid not in seen:
+            seen[rid] = today
+            new_ids.append(rid)
+    json.dump(seen, open(seen_path, "w"))
+    json.dump(sorted(set(new_ids)), open(os.path.join(ASSETS, "new_ids.json"), "w"))
+    print(f"Review tracking: {len(new_ids)} NEW creatives this run, {len(seen)} seen all-time.")
 
 def run(script, *args):
     env = dict(os.environ, REPO_ROOT=ROOT)
@@ -133,14 +153,16 @@ def run(script, *args):
 if __name__ == "__main__":
     items = run_scrape()
     extract(items)
+    update_review_tracking(items)
     run("classify.py")
     run("render.py")
     run("build_share.py")
-    # Freeze the MONTHLY archive so its thumbnails are permanent (the historical record).
+    # Freeze thumbnails into the SHARED pool (share/img/) so the live views render permanently.
+    run("freeze_version.py")                       # newest weekly version (what the hub features)
     ym = datetime.datetime.now().strftime("%Y-%m")
     monthly_dir = os.path.join(ROOT, "share", "monthly", ym)
     if os.path.isdir(monthly_dir):
-        run("freeze_version.py", monthly_dir)
+        run("freeze_version.py", monthly_dir)      # monthly archive (reuses the pool, near-instant)
     print("\nPipeline complete.")
 # padding line 1 — guards the file tail against OneDrive sync truncation; safe to ignore
 # padding line 2 — guards the file tail against OneDrive sync truncation; safe to ignore
@@ -158,21 +180,4 @@ if __name__ == "__main__":
 # padding line 14 — guards the file tail against OneDrive sync truncation; safe to ignore
 # padding line 15 — guards the file tail against OneDrive sync truncation; safe to ignore
 # padding line 16 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 17 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 18 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 19 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 20 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 21 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 22 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 23 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 24 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 25 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 26 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 27 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 28 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 29 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 30 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 31 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 32 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 33 — guards the file tail against OneDrive sync truncation; safe to ignore
-# padding line 34 — guards the file tail against OneDrive sync tru
+# padding line 1
