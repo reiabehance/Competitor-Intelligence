@@ -1,0 +1,57 @@
+name: Réia Re-freeze thumbnails (no scrape)
+
+on:
+  workflow_dispatch:        # manual button — no Apify scrape, no cost
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: reia-intel
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Re-freeze latest + monthly thumbnails (no Apify scrape)
+        env:
+          REPO_ROOT: ${{ github.workspace }}
+        run: |
+          python freeze_version.py
+          ym=$(date -u +%Y-%m)
+          if [ -d "share/monthly/$ym" ]; then python freeze_version.py "share/monthly/$ym"; fi
+
+      - name: Commit frozen images
+        run: |
+          git config user.name "reia-intel-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add share
+          git commit -m "Re-freeze thumbnails — $(date -u +%Y-%m-%d)" || echo "nothing to commit"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main || true
+            if git push; then echo "pushed"; break; fi
+            echo "push retry $i ..."; sleep 5
+          done
+
+      - name: Upload site (share/) for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: share
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
