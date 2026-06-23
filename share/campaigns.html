@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer"><title>Réia — Campaigns</title>
+<script src="config.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@400;500;600&family=Lora&display=swap');
+:root{--maroon:#7B0017;--ink:#15150e;--line:#e6dccb;--gold:#b78b2e;--paper:#f3ecdf;--done:#3f8f4f;--work:#b78b2e;--todo:#9a8f80;--block:#c0392b;}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Lora',Georgia,serif;}
+.top{background:var(--maroon);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.top .tt{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:700;}
+.nav a{color:#ffd9a8;font-family:'Poppins',sans-serif;font-size:.74rem;text-decoration:none;margin-left:12px;}
+.nav a.here{color:#fff;border-bottom:2px solid var(--gold);padding-bottom:2px;}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 18px 80px;}
+.add{display:flex;gap:8px;align-items:center;margin:6px 0 16px;font-family:'Poppins',sans-serif;font-size:.74rem;flex-wrap:wrap;}
+.add input{font-family:'Poppins',sans-serif;font-size:.82rem;border:1px solid var(--line);border-radius:10px;padding:8px 11px;min-width:240px;background:#fffdf8;}
+.add .btn{background:var(--maroon);color:#fff;border:none;border-radius:18px;padding:8px 16px;font-weight:600;cursor:pointer;font-size:.74rem;}
+.add .who{margin-left:auto;color:#8a7c6c;}.add .who b{color:var(--maroon);}
+.camp{background:#fff;border:1px solid var(--line);border-radius:13px;margin:10px 0;box-shadow:0 2px 10px rgba(0,0,0,.06);overflow:hidden;}
+.ch{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;flex-wrap:wrap;}
+.ch:hover{background:#fffaf1;}
+.ch .nm{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--maroon);}
+.ch .tag{font-family:'Poppins',sans-serif;font-size:.52rem;font-weight:700;color:#fff;background:var(--gold);border-radius:9px;padding:1px 8px;}
+.ch .bars{display:flex;gap:5px;margin-left:auto;font-family:'Poppins',sans-serif;font-size:.6rem;flex-wrap:wrap;}
+.ch .pill{font-size:.56rem;font-weight:700;padding:2px 9px;border-radius:11px;color:#fff;}
+.p-tot{background:#7B0017;}.p-todo{background:var(--todo);}.p-work{background:var(--work);}.p-done{background:var(--done);}
+.ch .rm{color:#c0392b;cursor:pointer;font-weight:700;font-family:'Poppins',sans-serif;font-size:.8rem;padding:0 4px;}
+.ch .cr{color:#8a7c6c;font-family:'Poppins',sans-serif;font-size:.9rem;transition:transform .15s;}
+.camp.open .cr{transform:rotate(90deg);}
+.items{display:none;padding:0 16px 12px;}
+.camp.open .items{display:block;}
+.item{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #f0e8da;font-family:'Poppins',sans-serif;font-size:.74rem;}
+.item img{width:40px;height:40px;object-fit:cover;border-radius:7px;border:1px solid var(--line);}
+.item .noimg{width:40px;height:40px;border-radius:7px;border:1px dashed var(--line);}
+.item .b{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:var(--maroon);}
+.item .st{font-size:.52rem;font-weight:700;padding:1px 7px;border-radius:9px;color:#fff;}
+.st-done{background:var(--done);}.st-work{background:var(--work);}.st-todo{background:var(--todo);}.st-block{background:var(--block);}
+.item .dz{color:#6b5f54;}
+.item a{margin-left:auto;color:#2f4d7a;text-decoration:none;font-weight:600;font-size:.66rem;}
+.empty{text-align:center;color:#8a7c6c;font-family:'Poppins',sans-serif;padding:14px;}
+.setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
+</style></head><body>
+<div class="top"><div class="tt">RÉIA — Campaigns</div>
+  <div class="nav"><a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a class="here" href="campaigns.html">🏷 Campaigns</a><a href="mywork.html">🧑‍🎨 My work</a><a href="worklist.html">🎨 Worklist</a></div>
+</div>
+<div class="wrap">
+<div class="add">
+  <input id="cname" placeholder="New campaign name — e.g. Festive — Dhanteras 2026">
+  <button class="btn" id="cadd">+ Add campaign</button>
+  <span class="who" id="who"></span>
+</div>
+<div id="list"></div>
+</div>
+<script>
+var BACKEND=(window.REIA_BACKEND||"").trim();
+var DATA={}, CAMPS={}, PEOPLE={};
+var STAGES={no:["To replicate","st-todo"],"in-progress":["Replicating","st-work"],blocked:["Blocked","st-block"],done:["Replicated ✓","st-done"]};
+function esc(s){return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function isReel(x){return (x.media||"").toLowerCase().indexOf("reel")>-1;}
+function campOf(x){return (x.campaign&&(""+x.campaign).trim())?(""+x.campaign).trim():"Unassigned";}
+function dzOf(x){return (x.designer&&(""+x.designer).trim())?(""+x.designer).trim():"—";}
+function nm(){var n=localStorage.getItem("reiaReviewer");if(!n){n=prompt("Your name (admins can manage campaigns):")||"";if(n)localStorage.setItem("reiaReviewer",n);}return n;}
+function isAdmin(name){var p=PEOPLE[name];return !!(p&&(""+p.is_admin).toLowerCase()==="yes");}
+function post(o){return fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)}).then(function(r){return r.json();}).catch(function(){return{};});}
+function load(){
+  if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Backend not connected.</b> Paste your /exec URL into page_urls.json → backend_url and re-run.</div>';return;}
+  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};CAMPS=(j&&j.campaigns)||{};PEOPLE=(j&&j.people)||{};render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store.</div>';});
+}
+function render(){
+  var me=localStorage.getItem("reiaReviewer")||"";
+  document.getElementById("who").innerHTML=me?("you: <b>"+esc(me)+"</b>"+(isAdmin(me)?" · admin":" · not admin")):"";
+  var items=Object.keys(DATA).map(function(k){return DATA[k];});
+  // universal campaign list + any campaign already used + Unassigned (if any)
+  var names={}; Object.keys(CAMPS).forEach(function(n){names[n]=1;}); items.forEach(function(x){names[campOf(x)]=1;});
+  var list=Object.keys(names).filter(function(n){return n!=="Unassigned";}).sort();
+  if(names["Unassigned"]) list.push("Unassigned");
+  var L=document.getElementById("list");
+  if(!list.length){L.innerHTML='<div class="empty">No campaigns yet. Add one above — it becomes available everywhere instantly.</div>';return;}
+  L.innerHTML=list.map(function(n){
+    var inC=items.filter(function(x){return campOf(x)===n;});
+    var c={no:0,"in-progress":0,blocked:0,done:0};inC.forEach(function(x){c[x.replicated||"no"]=(c[x.replicated||"no"]||0)+1;});
+    var inList=!!CAMPS[n];
+    var rows=inC.length?inC.map(function(x){var sm=STAGES[x.replicated||"no"]||STAGES.no;
+      return '<div class="item">'+(x.img?('<img src="'+esc(x.img)+'" referrerpolicy="no-referrer">'):'<div class="noimg"></div>')+
+        '<span class="b">'+esc(x.brand)+'</span><span class="st '+sm[1]+'">'+sm[0]+'</span>'+
+        '<span class="dz">'+esc(dzOf(x))+'</span><a href="'+esc(x.link)+'" target="_blank" rel="noopener">original ↗</a></div>';}).join(""):'<div class="empty">No creatives in this campaign yet.</div>';
+    return '<div class="camp" data-n="'+esc(n)+'"><div class="ch">'+
+      '<span class="cr">▶</span><span class="nm">🏷 '+esc(n)+'</span>'+(inList?'':'<span class="tag">used, not in list</span>')+
+      '<div class="bars"><span class="pill p-tot">'+inC.length+' total</span>'+
+        (c.no?'<span class="pill p-todo">'+c.no+' to do</span>':'')+
+        (c["in-progress"]?'<span class="pill p-work">'+c["in-progress"]+' working</span>':'')+
+        (c.done?'<span class="pill p-done">'+c.done+' done</span>':'')+'</div>'+
+      (inList&&n!=="Unassigned"?'<span class="rm" title="Remove campaign">✕</span>':'')+'</div>'+
+      '<div class="items">'+rows+'</div></div>';
+  }).join("");
+  bind();
+}
+function bind(){
+  document.querySelectorAll(".camp").forEach(function(c){
+    c.querySelector(".ch").addEventListener("click",function(e){ if(e.target.classList.contains("rm"))return; c.classList.toggle("open"); });
+    var rm=c.querySelector(".rm");
+    if(rm)rm.addEventListener("click",function(e){e.stopPropagation();var n=c.getAttribute("data-n");
+      if(!confirm("Remove campaign \""+n+"\" from the list? (Creatives already tagged keep their tag.)"))return;
+      post({kind:"campaign",action:"remove",name:n,by:nm()}).then(function(j){if(j&&j.error){alert(j.error);}else if(j&&j.campaigns){CAMPS=j.campaigns;render();}});});
+  });
+}
+document.getElementById("cadd").addEventListener("click",function(){
+  var n=document.getElementById("cname").value.trim();if(!n)return;
+  post({kind:"campaign",action:"add",name:n,by:nm()}).then(function(j){if(j&&j.error){alert(j.error);}else if(j&&j.campaigns){CAMPS=j.campaigns;document.getElementById("cname").value="";render();}});
+});
+load();
+</script>
+</body></html>
+<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->

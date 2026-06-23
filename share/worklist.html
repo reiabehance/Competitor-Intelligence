@@ -38,7 +38,7 @@ tr:last-child td{border-bottom:none;}
 .setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
 @media print{.bar,.top a,.btn{display:none;}body{background:#fff;}.thumb,.nothumb{display:none;}}
 </style></head><body>
-<div class="top"><div class="tt">RÉIA — Designer Worklist</div><div><a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a></div></div>
+<div class="top"><div class="tt">RÉIA — Designer Worklist</div><div><a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="campaigns.html">🏷 Campaigns</a><a href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a></div></div>
 <div class="wrap">
 <div class="bar">
   <span class="chip on" data-f="todo">To do</span>
@@ -75,7 +75,7 @@ function selected(){
 }
 function load(){
   if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Shared backend not connected.</b><br>Paste your /exec URL into <code>page_urls.json → backend_url</code> and re-run.</div>';return;}
-  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};var ppl=(j&&j.people)||{};fillDz(Object.keys(ppl).sort());render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store.</div>';});
+  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};var ppl=(j&&j.people)||{};fillDz(Object.keys(Object.assign({Jacob:1,Dishaba:1,Ashwanth:1,Prapanjj:1,Vasavi:1,Chittranjan:1},ppl)).sort());render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store.</div>';});
 }
 function fillDz(names){var s=document.getElementById("fdz");if(s.options.length>1)return;names.concat(["Unassigned"]).forEach(function(n){var o=document.createElement("option");o.textContent=n;s.appendChild(o);});}
 function render(){

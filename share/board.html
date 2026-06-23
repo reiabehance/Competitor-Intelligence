@@ -56,7 +56,7 @@ select.f{width:100%;font-family:'Poppins',sans-serif;font-size:.72rem;border:1px
 </style></head><body>
 <div class="top"><div class="tt">RÉIA — Replication Board</div>
   <div><span class="who" id="who"></span>
-  <a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a>
+  <a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="campaigns.html">🏷 Campaigns</a><a href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a>
   <a href="#" id="mng" style="color:#fff">⚙ People</a></div>
 </div>
 <div class="wrap">
@@ -101,7 +101,7 @@ function load(){
   if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Shared backend not connected.</b><br>Paste your Apps Script /exec URL into <code>page_urls.json → backend_url</code> and re-run.</div>';return;}
   fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};PEOPLE=(j&&j.people)||{};render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store.</div>';});
 }
-function designers(){return Object.keys(PEOPLE).sort();}
+function designers(){var s={Jacob:1,Dishaba:1,Ashwanth:1,Prapanjj:1,Vasavi:1,Chittranjan:1};Object.keys(PEOPLE).forEach(function(n){if(n)s[n]=1;});return Object.keys(s).sort();}
 function isAdmin(name){var p=PEOPLE[name];return !!(p&&(""+p.is_admin).toLowerCase()==="yes");}
 function items(){
   var a=Object.keys(DATA).map(function(k){return DATA[k];});

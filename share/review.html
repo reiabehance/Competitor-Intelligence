@@ -26,6 +26,8 @@
 .ph .noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#a89a88;font-size:.62rem;font-family:'Poppins',sans-serif;}
 .mb{position:absolute;top:7px;left:7px;font-family:'Poppins',sans-serif;font-size:.54rem;font-weight:700;padding:2px 7px;border-radius:8px;color:#fff;}
 .mb-r{background:#7B0017;}.mb-s{background:#2f4d7a;}
+.endedtag{position:absolute;bottom:6px;left:7px;font-family:'Poppins',sans-serif;font-size:.5rem;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(21,21,14,.62);color:#e9dcc8;}
+.card.ended{opacity:.72;}
 .star{position:absolute;top:6px;right:7px;font-size:1.1rem;color:#fff;cursor:pointer;text-shadow:0 1px 3px rgba(0,0,0,.5);}
 .star.on{color:var(--gold);}
 .bd{padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex:1;}
@@ -55,7 +57,7 @@
 .mc .rm{color:#c0392b;cursor:pointer;font-size:.72rem;margin-right:auto;}
 </style></head><body>
 <div class="top"><div class="tt">RÉIA — To Review</div>
-  <div class="nav"><a href="index.html">← Hub</a><a class="here" href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a></div>
+  <div class="nav"><a href="index.html">← Hub</a><a class="here" href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="campaigns.html">🏷 Campaigns</a><a href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a></div>
 </div>
 <div class="flow">FLOW: <b>1 Review</b> → 2 Star &amp; brief → 3 Assign on Board → 4 Replicate &amp; upload → 5 Feedback</div>
 <div class="wrap">
@@ -65,6 +67,17 @@
   <span class="chip" data-f="passed">Passed ✕</span>
   <span class="chip" data-f="starred">★ Sent to replicate</span>
   <span class="chip" data-f="all">All</span>
+  <select id="fseg" style="background:#faf4ea;border:1px solid var(--line);border-radius:16px;padding:6px 10px;font-family:'Poppins',sans-serif;font-size:.7rem;color:var(--ink);margin-left:6px;">
+    <option value="all">All segments</option>
+    <option value="direct">Direct competitors</option>
+    <option value="adjacent">Adjacent jewellery</option>
+    <option value="inspiration">✨ Inspiration only</option>
+  </select>
+  <select id="fact" title="Is the COMPETITOR still running this ad?" style="background:#faf4ea;border:1px solid var(--line);border-radius:16px;padding:6px 10px;font-family:'Poppins',sans-serif;font-size:.7rem;color:var(--ink);">
+    <option value="running">▶ Competitor still running</option>
+    <option value="all">Running + stopped</option>
+    <option value="stopped">⏹ Competitor stopped</option>
+  </select>
   <span class="who" id="who"></span>
 </div>
 <div id="count" class="muted" style="font-family:'Poppins',sans-serif;font-size:.7rem;margin-bottom:10px;"></div>
@@ -86,15 +99,14 @@
     <div><label>Assign designer</label><select id="adz"><option value="">— unassigned —</option></select></div>
     <div><label>Priority</label><select id="apr"><option>Urgent</option><option selected>Normal</option><option>High</option><option>Low</option></select></div>
   </div>
-  <label>Campaign / folder</label>
-  <input id="acamp" list="campaigns" placeholder="e.g. Festive — Diwali · Anniversary">
-  <datalist id="campaigns"><option value="Festive — Diwali"></option><option value="Anniversary"></option><option value="Proposal / Engagement"></option><option value="Wedding / Bridal"></option><option value="Everyday / Self-purchase"></option><option value="Offer / Sale"></option><option value="Evergreen / Brand"></option></datalist>
-  <div class="ft"><span class="rm" id="arm" style="display:none">Remove from replication</span><button class="btn2" id="acancel">Cancel</button><button class="btn" id="asave">Send to replicate ★</button></div>
+  <label>Campaign / folder <span style="text-transform:none;letter-spacing:0;color:#b08a2e">— pick from the shared list (manage it in the 🏷 Campaigns tab)</span></label>
+  <select id="acamp"><option value="">— none yet —</option></select>
+  <div class="ft"><span class="rm" id="arm" style="display:none">🚫 Reject &amp; remove from tracker</span><button class="btn2" id="acancel">Cancel</button><button class="btn" id="asave">Send to replicate ★</button></div>
 </div></div>
 
 <script>
 var BACKEND=(window.REIA_BACKEND||"").trim();
-var FILTER="todo", ITEMS=[], REV={}, SHORT={}, PEOPLE={}, CURK=null;
+var FILTER="todo", FSEG="all", FACT="running", ITEMS=[], REV={}, SHORT={}, PEOPLE={}, CAMPAIGNS={}, CURK=null;
 function esc(s){return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function isReel(x){return (x.media||"").toLowerCase().indexOf("reel")>-1;}
 function nm(){var n=localStorage.getItem("reiaReviewer");if(!n){n=prompt("Your name (e.g. Jacob):")||"";if(n)localStorage.setItem("reiaReviewer",n);}return n;}
@@ -102,8 +114,9 @@ function showWho(){var n=localStorage.getItem("reiaReviewer");document.getElemen
 function status(ck){var r=REV[ck];return r&&(r.status||r.considered)||"";}
 function norm(s){return s==="yes"?"considered":(s==="no"?"passed":s);}
 function post(o){if(!BACKEND)return Promise.resolve({});return fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)}).then(function(r){return r.json();}).catch(function(){return {};});}
-function fetchState(cb){if(!BACKEND){cb&&cb();return;}fetch(BACKEND).then(function(r){return r.json();}).then(function(j){REV=(j&&j.reviews)||{};SHORT=(j&&j.shortlist)||{};PEOPLE=(j&&j.people)||{};cb&&cb();}).catch(function(){cb&&cb();});}
-function designers(){return Object.keys(PEOPLE).sort();}
+function fetchState(cb){if(!BACKEND){cb&&cb();return;}fetch(BACKEND).then(function(r){return r.json();}).then(function(j){REV=(j&&j.reviews)||{};SHORT=(j&&j.shortlist)||{};PEOPLE=(j&&j.people)||{};CAMPAIGNS=(j&&j.campaigns)||{};cb&&cb();}).catch(function(){cb&&cb();});}
+function campList(){return Object.keys(CAMPAIGNS).sort();}
+function designers(){var s={Jacob:1,Dishaba:1,Ashwanth:1,Prapanjj:1,Vasavi:1,Chittranjan:1};Object.keys(PEOPLE).forEach(function(n){if(n)s[n]=1;});return Object.keys(s).sort();}
 function load(){if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Backend not connected.</b> Paste your /exec URL into page_urls.json → backend_url and re-run.</div>';return;}
   fetch("creatives.json",{cache:"no-store"}).then(function(r){return r.json();}).then(function(a){ITEMS=a||[];fetchState(render);}).catch(function(){ITEMS=[];fetchState(render);});}
 function render(){
@@ -114,7 +127,8 @@ function render(){
     if(FILTER==="considered")return st==="considered";
     if(FILTER==="passed")return st==="passed";
     if(FILTER==="starred")return !!SHORT[x.ckey];
-    return true;});
+    return true;}).filter(function(x){return FSEG==="all"||(x.seg||"")===FSEG;})
+    .filter(function(x){return FACT==="all"||(FACT==="running"?x.active!==false:x.active===false);});
   var todo=ITEMS.filter(function(x){return x.new&&norm(status(x.ckey))===""&&!SHORT[x.ckey];}).length;
   document.getElementById("count").innerHTML=(todo?('<b style="color:#7B0017">'+todo+' new awaiting review</b> · '):'')+items.length+" shown"+(BACKEND?"":' · backend not connected');
   if(!items.length){L.innerHTML='<div class="empty">Nothing here'+(FILTER==="todo"?" — all caught up ✓":"")+'</div>';return;}
@@ -124,12 +138,12 @@ function render(){
     var img=x.img?('<img src="'+esc(x.img)+'" referrerpolicy="no-referrer" loading="lazy">'):'<div class="noimg">no preview</div>';
     var by=(r.by?("by "+esc(r.by)+(r.at?(" · "+esc(r.at)):"")):"");
     var asg=sl?('<span class="assigned">★ '+(sl.designer?("→ "+esc(sl.designer)):"to replicate")+(sl.priority&&sl.priority!=="Normal"?(" · "+esc(sl.priority)):"")+'</span>'):'';
-    return '<div class="card'+(todo?' todo':'')+'" data-k="'+esc(x.ckey)+'">'+
-      '<div class="ph">'+img+(isReel(x)?'<span class="mb mb-r">REEL</span>':'<span class="mb mb-s">STATIC</span>')+'<span class="star'+(sl?" on":"")+'" title="Send to replication">★</span></div>'+
+    return '<div class="card'+(todo?' todo':'')+(x.active===false?' ended':'')+'" data-k="'+esc(x.ckey)+'">'+
+      '<div class="ph">'+img+(isReel(x)?'<span class="mb mb-r">REEL</span>':'<span class="mb mb-s">STATIC</span>')+(x.active===false?'<span class="endedtag" title="The competitor has stopped running this ad (not in the latest scrape)">⏹ competitor stopped</span>':'')+'<span class="star'+(sl?" on":"")+'" title="Send to replication">★</span></div>'+
       '<div class="bd"><div class="br">'+esc(x.brand)+'</div><div class="ct">'+esc(x.cat)+'</div>'+
       '<a class="vl" href="'+esc(x.link)+'" target="_blank" rel="noopener">view live ad ↗</a>'+asg+
       '<div class="acts"><button class="ok'+(st==="considered"?" act":"")+'" data-a="considered">Consider ✓</button>'+
-      '<button class="no'+(st==="passed"?" act":"")+'" data-a="passed">Pass ✕</button></div>'+
+      '<button class="no'+(st==="passed"?" act":"")+'" data-a="passed" title="Reject — don\'t want it; removes it from the tracker">🚫 Reject</button></div>'+
       '<div class="stat">'+(st?(st==="considered"?"Considered "+by:"Passed "+by):"awaiting review")+'</div></div></div>';
   }).join("");
   bind();
@@ -142,7 +156,8 @@ function bind(){
       var a=b.getAttribute("data-a"),cur=norm(status(ck)),nxt=cur===a?"":a,me=nm();
       if(nxt===""){delete REV[ck];post({kind:"review",ckey:ck,remove:true});}
       else{REV[ck]={kind:"review",ckey:ck,brand:x.brand,media:x.media,cat:x.cat,link:x.link,img:x.img,status:nxt,by:me,at:new Date().toISOString().slice(0,10)};post(REV[ck]);
-        if(nxt==="considered"&&!SHORT[ck]){openAssign(x);} }
+        if(nxt==="considered"&&!SHORT[ck]){openAssign(x);}
+        if(nxt==="passed"&&SHORT[ck]){delete SHORT[ck];post({kind:"shortlist",ckey:ck,remove:true});} }
       render();});});
   });
 }
@@ -155,7 +170,9 @@ function openAssign(x){
   document.getElementById("acopy").value=sl.copy||"";
   document.getElementById("abrief").value=sl.reason||"";
   document.getElementById("apr").value=sl.priority||"Normal";
-  document.getElementById("acamp").value=sl.campaign||"";
+  var cur=sl.campaign||""; var opts='<option value="">— none yet —</option>'+campList().map(function(n){return '<option'+(cur===n?' selected':'')+'>'+esc(n)+'</option>';}).join("");
+  if(cur&&campList().indexOf(cur)<0)opts+='<option selected>'+esc(cur)+'</option>';
+  document.getElementById("acamp").innerHTML=opts;
   document.getElementById("arm").style.display=sl.ckey?"inline":"none";
   document.getElementById("asave").textContent=sl.ckey?"Save brief":"Send to replicate ★";
   document.getElementById("amodal").classList.add("on");
@@ -172,10 +189,14 @@ document.getElementById("asave").addEventListener("click",function(){
     replicated:(SHORT[CURK]&&SHORT[CURK].replicated)||"no",by:nm()};
   SHORT[CURK]=o;post(o);closeAssign();render();
 });
-document.getElementById("arm").addEventListener("click",function(){if(!CURK)return;post({kind:"shortlist",ckey:CURK,remove:true});delete SHORT[CURK];closeAssign();render();});
+document.getElementById("arm").addEventListener("click",function(){if(!CURK)return;var k=CURK;post({kind:"shortlist",ckey:k,remove:true});delete SHORT[k];
+  REV[k]={kind:"review",ckey:k,status:"passed",by:nm(),at:new Date().toISOString().slice(0,10)};post(REV[k]);
+  closeAssign();render();});
 document.querySelectorAll(".chip").forEach(function(c){c.addEventListener("click",function(){document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});c.classList.add("on");FILTER=c.getAttribute("data-f");render();});});
+document.getElementById("fseg").addEventListener("change",function(){FSEG=this.value;render();});
+document.getElementById("fact").addEventListener("change",function(){FACT=this.value;render();});
 showWho();load();
 setInterval(function(){fetchState(render);},30000);
 </script>
 </body></html>
-<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->
+<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->
