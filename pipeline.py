@@ -151,9 +151,17 @@ def run(script, *args):
     print(f"\n>>> {script} {' '.join(args)}")
     subprocess.check_call([sys.executable, os.path.join(ROOT, script), *args], env=env)
 if __name__ == "__main__":
-    items = run_scrape()
-    extract(items)
-    update_review_tracking(items)
+    NO_SCRAPE = os.environ.get("REIA_NO_SCRAPE") == "1"
+    if NO_SCRAPE:
+        # Rebuild the site from the LAST scrape's data (data/raw/latest_scrape.csv) — NO Apify call, NO cost.
+        csvp = os.path.join(RAW, "latest_scrape.csv")
+        if not os.path.exists(csvp):
+            sys.exit("REIA_NO_SCRAPE set but no previous scrape found at data/raw/latest_scrape.csv — run a normal scrape once first.")
+        print("NO-SCRAPE rebuild: reusing", csvp, "(no Apify cost).")
+    else:
+        items = run_scrape()
+        extract(items)
+        update_review_tracking(items)
     run("classify.py")
     run("render.py")
     run("build_share.py")

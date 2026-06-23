@@ -54,7 +54,7 @@ select.flt{background:#faf4ea;border:1px solid var(--line);border-radius:16px;pa
 .setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
 </style></head><body>
 <div class="top"><div class="tt">RÉIA — Finalised &amp; Replication</div>
-  <div class="nav"><a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="mywork.html">🧑‍🎨 My work</a><a class="here" href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a></div>
+  <div class="nav"><a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="campaigns.html">🏷 Campaigns</a><a href="mywork.html">🧑‍🎨 My work</a><a class="here" href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a></div>
 </div>
 <div class="flow">FLOW: 1 Review → 2 Star &amp; brief → 3 Assign → 4 Replicate &amp; upload → <b>5 Feedback (here)</b></div>
 <div class="wrap">
@@ -77,7 +77,8 @@ select.flt{background:#faf4ea;border:1px solid var(--line);border-radius:16px;pa
 </div>
 <script>
 var BACKEND=(window.REIA_BACKEND||"").trim();
-var FILTER="all", FCAMP="all", FDZ="all", FPR="all", DATA={}, PEOPLE={};
+var FILTER="all", FCAMP="all", FDZ="all", FPR="all", DATA={}, PEOPLE={}, CAMPAIGNS={};
+function campList(){return Object.keys(CAMPAIGNS).sort();}
 var STAGES=[["no","To replicate","st-todo"],["in-progress","Replicating","st-work"],["blocked","Blocked / not working","st-block"],["done","Replicated ✓","st-done"]];
 var PRIOS=["Urgent","High","Normal","Low"];
 var FORMATS=[["sq","1:1 Square","img"],["portrait","4:5 Portrait","img"],["story","9:16 Story","img"],["reel","Reel / Video","link"]];
@@ -85,13 +86,13 @@ function esc(s){return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&l
 function isReel(x){return (x.media||"").toLowerCase().indexOf("reel")>-1;}
 function campOf(x){return (x.campaign&&(""+x.campaign).trim())?(""+x.campaign).trim():"Unassigned";}
 function stageMeta(r){r=r||"no";for(var i=0;i<STAGES.length;i++)if(STAGES[i][0]===r)return STAGES[i];return STAGES[0];}
-function designers(){return Object.keys(PEOPLE).sort();}
+function designers(){var s={Jacob:1,Dishaba:1,Ashwanth:1,Prapanjj:1,Vasavi:1,Chittranjan:1};Object.keys(PEOPLE).forEach(function(n){if(n)s[n]=1;});return Object.keys(s).sort();}
 function nm(){var n=localStorage.getItem("reiaReviewer");if(!n){n=prompt("Your name (e.g. Réia):")||"";if(n)localStorage.setItem("reiaReviewer",n);}return n;}
 function assetsOf(x){var a={};try{a=JSON.parse(x.assets||"{}");}catch(e){a={};}return a;}
 function aurl(v){if(/^https?:/.test(v))return {view:v,dl:v,thumb:v};return {view:"https://drive.google.com/uc?export=view&id="+v,dl:"https://drive.google.com/uc?export=download&id="+v,thumb:"https://drive.google.com/thumbnail?id="+v+"&sz=w240"};}
 function load(){
   if(!BACKEND){document.getElementById("list").innerHTML='<div class="setup"><b>Backend not connected.</b> Paste your /exec URL into page_urls.json → backend_url and re-run.</div>';return;}
-  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};PEOPLE=(j&&j.people)||{};render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store.</div>';});
+  fetch(BACKEND).then(function(r){return r.json();}).then(function(j){DATA=(j&&j.shortlist)||{};PEOPLE=(j&&j.people)||{};CAMPAIGNS=(j&&j.campaigns)||{};render();}).catch(function(){document.getElementById("list").innerHTML='<div class="empty">Could not reach the shared store.</div>';});
 }
 function pc(cls,n,l){return '<div class="pc '+cls+'"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
 function counts(){var a=Object.keys(DATA).map(function(k){return DATA[k];});var c={no:0,"in-progress":0,blocked:0,done:0},up=0;
@@ -133,7 +134,7 @@ function card(x){
     '<div class="hd">'+th+'<b>'+esc(x.brand)+'</b><span class="pill '+(isReel(x)?"mb-r":"mb-s")+'">'+(isReel(x)?"REEL":"STATIC")+'</span>'+
       '<span class="pill cat">'+esc(x.cat)+'</span><span class="pill '+sm[2]+'">'+sm[1]+'</span><span class="pill pr-'+((x.priority||"Normal").toLowerCase())+'">'+esc(x.priority||"Normal")+'</span>'+
       '<a style="margin-left:auto;font-family:Poppins;font-size:.66rem;color:#2f4d7a;text-decoration:none" href="'+esc(x.link)+'" target="_blank" rel="noopener">original ↗</a></div>'+
-    '<div class="r3"><div class="fld"><label>Campaign / folder</label><input class="campaign" list="campaigns" value="'+esc(x.campaign||"")+'"></div>'+
+    '<div class="r3"><div class="fld"><label>Campaign / folder</label><select class="campaign"><option value="">— none —</option>'+campList().map(function(n){return '<option'+((x.campaign||"")===n?' selected':'')+'>'+esc(n)+'</option>';}).join("")+((x.campaign&&campList().indexOf(x.campaign)<0)?('<option selected>'+esc(x.campaign)+'</option>'):'')+'</select></div>'+
       '<div class="fld"><label>Designer</label><select class="designer">'+dzo()+'</select></div>'+
       '<div class="fld"><label>Priority</label><select class="priority">'+pro()+'</select></div></div>'+
     '<div class="r2"><div class="fld"><label>🎯 Objective — what we want to achieve</label><textarea class="objective">'+esc(x.objective)+'</textarea></div>'+
@@ -173,4 +174,4 @@ document.getElementById("fpr").addEventListener("change",function(){FPR=this.val
 load();
 </script>
 </body></html>
-<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->
+<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->

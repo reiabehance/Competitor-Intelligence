@@ -57,7 +57,7 @@
 .setup{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:16px 20px;font-size:.9rem;}
 </style></head><body>
 <div class="top"><div class="tt">RÉIA — My Work</div>
-  <div class="nav"><a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a class="here" href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a></div>
+  <div class="nav"><a href="index.html">← Hub</a><a href="review.html">🔔 Review</a><a href="board.html">📊 Board</a><a href="campaigns.html">🏷 Campaigns</a><a class="here" href="mywork.html">🧑‍🎨 My work</a><a href="shortlist.html">★ Finalised</a><a href="worklist.html">🎨 Worklist</a></div>
 </div>
 <div class="flow">FLOW: 1 Review → 2 Star &amp; brief → 3 Assign → <b>4 Replicate &amp; upload (you are here)</b> → 5 Feedback</div>
 <div class="wrap">
@@ -77,7 +77,7 @@ function dzOf(x){return (x.designer&&(""+x.designer).trim())?(""+x.designer).tri
 function stageMeta(r){r=r||"no";for(var i=0;i<STAGES.length;i++)if(STAGES[i][0]===r)return STAGES[i];return STAGES[0];}
 function nm(){var n=localStorage.getItem("reiaReviewer");if(!n){n=prompt("Your name (e.g. Jacob):")||"";if(n)localStorage.setItem("reiaReviewer",n);}return n;}
 function qp(k){var m=new RegExp("[?&]"+k+"=([^&]+)").exec(location.search);return m?decodeURIComponent(m[1]):null;}
-function designers(){return Object.keys(PEOPLE).sort();}
+function designers(){var s={Jacob:1,Dishaba:1,Ashwanth:1,Prapanjj:1,Vasavi:1,Chittranjan:1};Object.keys(PEOPLE).forEach(function(n){if(n)s[n]=1;});return Object.keys(s).sort();}
 function prRank(p){var i=PRIOS.indexOf(p||"Normal");return i<0?2:i;}
 function assetsOf(x){var a={};try{a=JSON.parse(x.assets||"{}");}catch(e){a={};}return a;}
 function aurl(v){ if(/^https?:/.test(v)) return {view:v,dl:v,thumb:v}; return {view:"https://drive.google.com/uc?export=view&id="+v,dl:"https://drive.google.com/uc?export=download&id="+v,thumb:"https://drive.google.com/thumbnail?id="+v+"&sz=w240"}; }

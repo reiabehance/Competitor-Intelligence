@@ -18,6 +18,7 @@ if os.path.exists(BASE+"/review.html"): shutil.copy(BASE+"/review.html", SHARE+"
 if os.path.exists(BASE+"/worklist.html"): shutil.copy(BASE+"/worklist.html", SHARE+"/worklist.html")
 if os.path.exists(BASE+"/board.html"): shutil.copy(BASE+"/board.html", SHARE+"/board.html")
 if os.path.exists(BASE+"/mywork.html"): shutil.copy(BASE+"/mywork.html", SHARE+"/mywork.html")
+if os.path.exists(BASE+"/campaigns.html"): shutil.copy(BASE+"/campaigns.html", SHARE+"/campaigns.html")
 if os.path.exists(BASE+"/data/assets/creatives.json"): shutil.copy(BASE+"/data/assets/creatives.json", SHARE+"/creatives.json")
 now=datetime.datetime.now()
 stamp=now.strftime("%Y-%m-%d_%H%M"); ym=now.strftime("%Y-%m"); nice=now.strftime("%d %b %Y, %H:%M")
@@ -93,6 +94,7 @@ B.append(f'<div class="latest"><div class="lab">Latest snapshot</div><h2>{html.e
          f'<a class="btn" style="background:#1f8a4c;color:#fff" href="review.html">🔔 To review →</a> '
          f'<a class="btn" style="background:#2f4d7a;color:#fff" href="board.html">📊 Replication board →</a> '
          f'<a class="btn" style="background:#5d3a7a;color:#fff" href="mywork.html">🧑‍🎨 My work →</a> '
+         f'<a class="btn" style="background:#b78b2e;color:#1a1a12" href="campaigns.html">🏷 Campaigns →</a> '
          f'<a class="btn" style="background:#b78b2e;color:#1a1a12" href="shortlist.html">★ Finalised &amp; replication →</a> '
          f'<a class="btn" style="background:#2f4d7a;color:#fff" href="worklist.html">🎨 Designer worklist →</a></div></div>')
 for monthname,items in by.items():
@@ -108,8 +110,7 @@ B.append(f'<div class="foot">{len(man)} versions archived. Each snapshot is froz
 OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><title>Reia Competitor Intelligence Archive</title><style>"+CSS+"</style></head><body>"+''.join(B)+"</body></html>"
 open(SHARE+"/index.html","w",encoding="utf-8").write(OUT)
 print("HUB wrote",len(man),"versions; config.js backend=",("set" if _BU else "EMPTY"))
-# padding 1 — guards file tail
-# padding 2 — guards file tail
-# padding 3 — guards file tail
-# padding 4 — guards file tail
-# padding 5 — guards file tail
+# padding guard
+# padding guard
+# padding guard
+# padding guard

@@ -101,7 +101,8 @@ def thumb(a,big=False):
           f' data-cat="{html.escape(a.get("cat",""))}" data-media="{html.escape(m)}" data-img="{html.escape(u or "")}" title="Shortlist this creative to replicate">★</span>')
     _bn=a.get("_brand","")
     if _bn and not _bn.lower().replace("é","e").startswith("reia"):
-        CREATIVES[_rid]={"ckey":_rid,"brand":_bn,"media":m,"cat":a.get("cat",""),"link":a["link"],"img":u or "","new":bool(a.get("new"))}
+        _seg={1:"direct",2:"adjacent",3:"inspiration"}.get(meta.get(_bn,{}).get("group"),"")
+        CREATIVES[_rid]={"ckey":_rid,"brand":_bn,"media":m,"cat":a.get("cat",""),"link":a["link"],"img":u or "","new":bool(a.get("new")),"seg":_seg}
     newrib='<span class="newrib">NEW</span>' if isnew else ''
     rvbtn=(f'<span class="rvbtn" data-rid="{html.escape(_rid)}" data-brand="{html.escape(a.get("_brand",""))}"'
            f' title="Review: click to cycle Unreviewed -> Considered -> Not considered"></span>')
@@ -480,8 +481,27 @@ REVIEW=""
 BJS='<script>window.REIA_BACKEND="'+BACKEND+'";</script>'
 OUT="<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width, initial-scale=1'><meta name=referrer content=no-referrer><title>Reia Competitor Intelligence</title>"+BJS+"<style>"+CSS+"</style></head><body>"+''.join(B)+LAZY+SEARCH+SAVED+REVIEW+"</body></html>"
 open(BASE+"/reports/Reia-Competitor-Creative-Breakdown.html","w",encoding="utf-8").write(OUT)
-json.dump(sorted(CREATIVES.values(), key=lambda x:(not x["new"], x["brand"])), open(A+"creatives.json","w"))
-print("WROTE", len(OUT), "chars,", OUT.count('class="star"'), "stars,", OUT.count('class="rvbtn"'), "review,", OUT.count('newrib'), "new, creatives.json", len(CREATIVES))
-# tail-guard padding (truncation here is harmless)
-# tail-guard padding (truncation here is harmless)
-# tail-guard padding (truncation here is harmless)
+# ---- UNIVERSAL creatives registry: accumulate across runs, dedupe by ckey, so review/replicate/new state never repeats ----
+import datetime as _dt
+_REGP=BASE+"/data/creatives_registry.json"; _TD=_dt.date.today().isoformat()
+try: REG=json.load(open(_REGP))
+except Exception: REG={}
+_PREV=set(REG.keys())
+for _k,_c in CREATIVES.items():
+    if _k in REG:
+        REG[_k].update({"brand":_c["brand"],"media":_c["media"],"cat":_c["cat"],"link":_c["link"],"img":(_c["img"] or REG[_k].get("img","")),"seg":_c.get("seg",""),"last_seen":_TD,"active":True})
+    else:
+        REG[_k]={"ckey":_k,"brand":_c["brand"],"media":_c["media"],"cat":_c["cat"],"link":_c["link"],"img":_c["img"],"seg":_c.get("seg",""),"first_seen":_TD,"last_seen":_TD,"active":True}
+for _k in list(REG.keys()):
+    if _k not in CREATIVES: REG[_k]["active"]=False
+def _old(s):
+    try: return (_dt.date.today()-_dt.date.fromisoformat(s)).days>60
+    except: return False
+REG={_k:_v for _k,_v in REG.items() if _v.get("active") or not _old(_v.get("last_seen",""))}
+for _k,_v in REG.items(): _v["new"]=bool(_v.get("active") and _k not in _PREV)
+json.dump(REG, open(_REGP,"w"))
+json.dump(sorted(REG.values(), key=lambda x:(not x.get("new"), not x.get("active"), x.get("brand",""))), open(A+"creatives.json","w"))
+print("WROTE", len(OUT), "chars; this-run", len(CREATIVES), "; registry", len(REG), "; new", sum(1 for v in REG.values() if v.get("new")), "; active", sum(1 for v in REG.values() if v.get("active")))
+# tail-guard padding
+# tail-guard padding
+# tail-guard padding
