@@ -153,7 +153,8 @@ function rowHtml(x){
       '<div class="sub">'+esc(x.cat)+' · 🏷 '+esc(campOf(x))+'</div></div>'+
     '<div class="cell"><div class="lab">Designer</div><select class="f sd"><option value="">— assign —</option>'+dz+'</select></div>'+
     '<div class="cell"><div class="lab">Priority</div><select class="f sp">'+PRIOS.map(function(p){return opt(p,x.priority||"Normal");}).join("")+'</select></div>'+
-    '<div class="cell"><div class="lab">Stage</div><select class="f ss">'+STAGES.map(function(s){return '<option value="'+s[0]+'"'+(stageOf(x)===s[0]?' selected':'')+'>'+s[1]+'</option>';}).join("")+'</select></div>'+
+    '<div class="cell"><div class="lab">Stage</div><select class="f ss">'+STAGES.map(function(s){return '<option value="'+s[0]+'"'+(stageOf(x)===s[0]?' selected':'')+'>'+s[1]+'</option>';}).join("")+'</select>'+
+      '<div class="lab" style="margin-top:5px">📅 Due date</div><input type="date" class="f sdue" value="'+esc(x.due_date||"")+'"></div>'+
     '<div class="cell links"><span class="pill '+sm[2]+'">'+sm[1]+'</span> <span class="pill '+prMeta(x.priority)+'">'+esc(x.priority||"Normal")+'</span><a href="'+esc(x.link)+'" target="_blank" rel="noopener">original ↗</a>'+our+'</div>'+
   '</div>';
 }
@@ -164,6 +165,7 @@ function bind(){
     r.querySelector(".sd").addEventListener("change",function(){x.designer=this.value;save();});
     r.querySelector(".sp").addEventListener("change",function(){x.priority=this.value;save();});
     r.querySelector(".ss").addEventListener("change",function(){x.replicated=this.value;save();});
+    var du=r.querySelector(".sdue");if(du)du.addEventListener("change",function(){x.due_date=this.value;save();});
   });
 }
 // view + filters
@@ -184,7 +186,4 @@ document.getElementById("who").textContent=localStorage.getItem("reiaReviewer")?
 load();
 </script>
 </body></html>
-<!-- tail-guard (after </html>) -->
-<!-- tail-guard (after </html>) -->
-<!-- tail-guard (after </html>) -->
-<!-- tail-guard (after </html>) -->
+<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->

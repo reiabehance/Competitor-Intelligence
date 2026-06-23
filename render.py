@@ -407,7 +407,8 @@ nav='<a href="#vsfield">Réia vs field</a> <a href="#overview">Overview</a> '+' 
 B=[]
 B.append('<a id="reviewbtn" href="review.html" style="text-decoration:none;position:fixed;right:18px;bottom:64px;z-index:90;background:#1f8a4c;color:#fff;font-family:\'Poppins\',sans-serif;font-size:.8rem;font-weight:600;padding:11px 18px;border-radius:26px;box-shadow:0 6px 20px rgba(31,138,76,.35);">🔔 To review <span id="reviewn">0</span></a>')
 B.append('<a id="savedbtn" href="shortlist.html" style="text-decoration:none">★ Finalised &amp; replication <span id="savedn">0</span></a>')
-B.append('<div class="top"><div class="tt">RÉIA · Competitor &amp; Category Creative Intelligence</div><div class="nav">'+nav+'</div></div><div class="wrap">')
+B.append('<div class="tabnav" style="position:sticky;top:0;z-index:120;background:#fff;border-bottom:1px solid #e6dccb;padding:7px 14px;display:flex;gap:6px;flex-wrap:wrap;font-family:Poppins,sans-serif;font-size:.72rem;align-items:center;"><b style="color:#7B0017;margin-right:6px;font-family:Cormorant Garamond,serif;font-size:.95rem;">RÉIA</b><a data-h="index.html" class="tn">🏠 Hub</a><a data-h="review.html" class="tn">🔔 Review</a><a data-h="board.html" class="tn">📊 Board</a><a data-h="campaigns.html" class="tn">🏷 Campaigns</a><a data-h="mywork.html" class="tn">🧑‍🎨 My work</a><a data-h="shortlist.html" class="tn">★ Finalised</a><a data-h="worklist.html" class="tn">🎨 Worklist</a><span style="margin-left:auto;color:#8a7c6c">This page = the breakdown · ★ any creative to brief it</span></div>')
+B.append('<div class="top"><div class="tt">R\u00c9IA \u00b7 Competitor &amp; Category Creative Intelligence</div><div class="nav">'+nav+'</div></div><div id=\"bkmodal\" style=\"position:fixed;inset:0;background:rgba(21,21,14,.45);display:none;align-items:center;justify-content:center;z-index:300;\"><div style=\"background:#fff;border-radius:14px;padding:20px 22px;max-width:440px;width:94%;max-height:90vh;overflow:auto;font-family:Poppins,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3);\"><h3 style=\"font-family:Cormorant Garamond,serif;color:#7B0017;margin:0 0 4px;font-size:1.35rem;\">Send to replication — write the brief</h3><div id=\"bksub\" style=\"font-size:.7rem;color:#8a7c6c;margin-bottom:8px;\"></div><label class=\"bkl\">🎯 Objective — what are we trying to achieve?</label><textarea id=\"bkobj\" class=\"bkt\"></textarea><label class=\"bkl\">✍️ Caption — the post caption</label><textarea id=\"bkcap\" class=\"bkt\"></textarea><label class=\"bkl\">🅰️ On-creative copy</label><textarea id=\"bkcopy\" class=\"bkt\"></textarea><label class=\"bkl\">🎬 Creative direction — what to make</label><textarea id=\"bkbrief\" class=\"bkt\"></textarea><div style=\"display:grid;grid-template-columns:1fr 1fr;gap:10px;\"><div><label class=\"bkl\">Designer</label><select id=\"bkdz\" class=\"bki\"></select></div><div><label class=\"bkl\">Priority</label><select id=\"bkpr\" class=\"bki\"><option>Urgent</option><option selected>Normal</option><option>High</option><option>Low</option></select></div></div><label class=\"bkl\">Campaign / folder</label><select id=\"bkcamp\" class=\"bki\"></select><div style=\"display:flex;gap:8px;justify-content:flex-end;margin-top:14px;align-items:center;\"><span id=\"bkrm\" style=\"color:#c0392b;cursor:pointer;font-size:.72rem;margin-right:auto;display:none;\">🚫 Reject &amp; remove</span><button id=\"bkcancel\" class=\"bkb2\">Cancel</button><button id=\"bksave\" class=\"bkb\">Send to replicate ★</button></div></div></div><div class="wrap">')
 B.append(f'<div class="hero"><div class="k">Holistic creative breakdown · {stats["brands"]} brands · 12 June 2026</div><h1>Where Réia stands — and what every brand is winning on</h1><div class="sub">Read it top to bottom: how you compare, the full brand matrix, then each brand\'s winning creatives with the Réia twist.</div></div>')
 B.append(f'<div class="statrow"><div class="stat"><div class="n">{stats["brands"]}</div><div class="l">Brands tracked</div></div><div class="stat"><div class="n">{stats["unique"]}</div><div class="l">Live placements</div></div><div class="stat s2"><div class="n">{stats["winning"]}</div><div class="l">Winning 2+wk</div></div><div class="stat s4"><div class="n">{stats["losing"]+stats["newly"]}</div><div class="l">Short-run + new</div></div></div>')
 B.append(vspanel)
@@ -426,52 +427,54 @@ SAVED="""<style>
 .th.needs-review{outline:2px solid #b78b2e;outline-offset:1px;animation:reiapulse 1.7s ease-in-out infinite;}
 @keyframes reiapulse{0%,100%{box-shadow:0 0 0 0 rgba(183,139,46,.55);}50%{box-shadow:0 0 0 5px rgba(183,139,46,0);}}
 .star.on{color:#b78b2e;text-shadow:0 0 4px rgba(0,0,0,.5);}
+.tabnav a.tn{color:#7B0017;text-decoration:none;font-weight:600;background:#faf4ea;border:1px solid #e6dccb;border-radius:14px;padding:5px 11px;}
+.tabnav a.tn:hover{background:#7B0017;color:#fff;}
+#bkmodal .bkl{display:block;font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;color:#8a7c6c;margin:9px 0 3px;}
+#bkmodal .bkt{width:100%;min-height:46px;resize:vertical;font-family:'Lora',serif;font-size:.86rem;border:1px solid #e6dccb;border-radius:8px;padding:7px 9px;background:#fffdf8;}
+#bkmodal .bki{width:100%;font-family:'Poppins',sans-serif;font-size:.82rem;border:1px solid #e6dccb;border-radius:8px;padding:7px 9px;background:#fffdf8;}
+#bkmodal .bkb{background:#7B0017;color:#fff;border:none;border-radius:18px;padding:8px 18px;font-weight:600;cursor:pointer;font-size:.78rem;}
+#bkmodal .bkb2{background:#faf4ea;color:#7B0017;border:1px solid #e6dccb;border-radius:18px;padding:8px 14px;font-weight:600;cursor:pointer;font-size:.78rem;}
 </style>
 <script>
 (function(){
 var BACKEND=(window.REIA_BACKEND||'').trim();
-var NK='reiaReviewer', LSL='reiaSaved', LRV='reiaReviews';
-var SHORT={}, REV={};
+var NK='reiaReviewer';
+var SHORT={}, REV={}, PEOPLE={}, CAMPS={}, CURK=null;
 function esc(s){return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function who(){var n=localStorage.getItem(NK);if(!n){n=prompt('Your name (so the team sees who reviewed / shortlisted it, e.g. Jacob):')||'';if(n){localStorage.setItem(NK,n);}}return n;}
-function lload(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch(e){return {};}}
-function lsave(k,o){localStorage.setItem(k,JSON.stringify(o));}
+function who(){var n=localStorage.getItem(NK);if(!n){n=prompt('Your name (e.g. Jacob):')||'';if(n){localStorage.setItem(NK,n);}}return n;}
 function meta(star){return {ckey:star.getAttribute('data-rid'),link:star.getAttribute('data-link'),brand:star.getAttribute('data-brand'),media:star.getAttribute('data-media'),cat:star.getAttribute('data-cat'),img:star.getAttribute('data-img')};}
-function post(o){
- if(!BACKEND){ // local fallback so it still works before the shared backend is connected
-   if(o.kind==='shortlist'){var s=lload(LSL);if(o.remove){delete s[o.ckey];}else{s[o.ckey]=o;}lsave(LSL,s);}
-   else{var r=lload(LRV);if(o.remove){delete r[o.ckey];}else{r[o.ckey]=o;}lsave(LRV,r);}
-   return;
- }
- fetch(BACKEND,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(o)});
-}
+function post(o){if(BACKEND)fetch(BACKEND,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(o)});}
 function applyAll(){
- // stars: gold when shortlisted (shared)
  document.querySelectorAll('.star').forEach(function(s){s.classList.toggle('on',!!SHORT[s.getAttribute('data-rid')]);});
- // reviews: conscious — a NEW ad stays flagged 'needs-review' until a human clicks. Rendering never marks it seen.
- document.querySelectorAll('.rvbtn').forEach(function(b){
-   var th=b.parentNode, id=b.getAttribute('data-rid'), r=REV[id];
-   th.classList.remove('rv-yes','rv-no','needs-review');
-   var st=r&&(r.status||r.considered);
-   if(st==='considered'||st==='yes'){th.classList.add('rv-yes');b.title='Considered for Réia by '+(r.by||'?')+' ('+(r.at||'')+')';}
-   else if(st==='passed'||st==='no'){th.classList.add('rv-no');b.title='Reviewed & passed by '+(r.by||'?')+' ('+(r.at||'')+')';}
-   else{b.title='Conscious review: click = Considered for Réia, again = Passed, again = clear';
-        if(th.getAttribute('data-new')==='1'){th.classList.add('needs-review');}}
- });
- var nn=document.querySelectorAll('.th.needs-review').length;
- var n=document.getElementById('savedn');if(n)n.textContent=Object.keys(SHORT).length;
- var rn=document.getElementById('reviewn');if(rn)rn.textContent=nn;
- var rb=document.getElementById('reviewbtn');if(rb)rb.style.display=nn?'':'none';
+ document.querySelectorAll('.rvbtn').forEach(function(b){var th=b.parentNode,id=b.getAttribute('data-rid'),r=REV[id];th.classList.remove('rv-yes','rv-no','needs-review');var st=r&&(r.status||r.considered);if(st==='considered'||st==='yes'){th.classList.add('rv-yes');}else if(st==='passed'||st==='no'){th.classList.add('rv-no');}else if(th.getAttribute('data-new')==='1'){th.classList.add('needs-review');}});
+ var nn=document.querySelectorAll('.th.needs-review').length;var n=document.getElementById('savedn');if(n)n.textContent=Object.keys(SHORT).length;var rn=document.getElementById('reviewn');if(rn)rn.textContent=nn;var rb=document.getElementById('reviewbtn');if(rb)rb.style.display=nn?'':'none';
 }
-function loadAll(){
- if(!BACKEND){SHORT=lload(LSL);REV=lload(LRV);applyAll();return;}
- fetch(BACKEND).then(function(r){return r.json();}).then(function(j){SHORT=(j&&j.shortlist)||{};REV=(j&&j.reviews)||{};applyAll();}).catch(function(){SHORT=lload(LSL);REV=lload(LRV);applyAll();});
+function loadAll(){if(!BACKEND){applyAll();return;}fetch(BACKEND).then(function(r){return r.json();}).then(function(j){SHORT=(j&&j.shortlist)||{};REV=(j&&j.reviews)||{};PEOPLE=(j&&j.people)||{};CAMPS=(j&&j.campaigns)||{};applyAll();}).catch(function(){applyAll();});}
+function opts(list,cur,none){var o=none?('<option value="">'+none+'</option>'):'';list.forEach(function(n){o+='<option'+(cur===n?' selected':'')+'>'+esc(n)+'</option>';});if(cur&&list.indexOf(cur)<0)o+='<option selected>'+esc(cur)+'</option>';return o;}
+function openAssign(star){
+ CURK=star.getAttribute('data-rid');var sl=SHORT[CURK]||{};var m=meta(star);
+ document.getElementById('bksub').innerHTML=esc(m.brand)+' · '+esc(m.cat)+' · '+esc(m.media);
+ document.getElementById('bkobj').value=sl.objective||'';document.getElementById('bkcap').value=sl.caption||'';
+ document.getElementById('bkcopy').value=sl.copy||'';document.getElementById('bkbrief').value=sl.reason||'';
+ document.getElementById('bkpr').value=sl.priority||'Normal';
+ document.getElementById('bkdz').innerHTML=opts(Object.keys(PEOPLE).sort(),sl.designer||'','— unassigned —');
+ document.getElementById('bkcamp').innerHTML=opts(Object.keys(CAMPS).sort(),sl.campaign||'','— none —');
+ document.getElementById('bkrm').style.display=sl.ckey?'inline':'none';
+ document.getElementById('bksave').textContent=sl.ckey?'Save brief':'Send to replicate ★';
+ document.getElementById('bkmodal').style.display='flex';
 }
-// shortlist toggle (★)
-document.addEventListener('click',function(e){var s=e.target.closest&&e.target.closest('.star');if(!s)return;e.preventDefault();e.stopPropagation();var id=s.getAttribute('data-rid');if(SHORT[id]){delete SHORT[id];post({kind:'shortlist',ckey:id,remove:true});}else{var m=meta(s);m.kind='shortlist';m.by=who();m.reason='';m.replicated='no';m.usage='';SHORT[id]=m;post(m);}applyAll();});
-// conscious review cycle (dot): unreviewed -> considered -> passed -> clear
+function closeAssign(){document.getElementById('bkmodal').style.display='none';CURK=null;}
+document.addEventListener('click',function(e){var s=e.target.closest&&e.target.closest('.star');if(!s)return;e.preventDefault();e.stopPropagation();openAssign(s);});
+document.getElementById('bkcancel').addEventListener('click',closeAssign);
+document.getElementById('bksave').addEventListener('click',function(){if(!CURK)return;var prev=SHORT[CURK]||{};var star=document.querySelector('.star[data-rid=\"'+CURK+'\"]');var m=star?meta(star):{};
+ var o={kind:'shortlist',ckey:CURK,brand:prev.brand||m.brand,media:prev.media||m.media,cat:prev.cat||m.cat,link:prev.link||m.link,img:prev.img||m.img};
+ o.objective=document.getElementById('bkobj').value;o.caption=document.getElementById('bkcap').value;o.copy=document.getElementById('bkcopy').value;o.reason=document.getElementById('bkbrief').value;
+ o.designer=document.getElementById('bkdz').value;o.priority=document.getElementById('bkpr').value;o.campaign=document.getElementById('bkcamp').value;
+ o.replicated=prev.replicated||'no';o.by=who();SHORT[CURK]=o;post(o);closeAssign();applyAll();});
+document.getElementById('bkrm').addEventListener('click',function(){if(!CURK)return;var k=CURK;post({kind:'shortlist',ckey:k,remove:true});delete SHORT[k];REV[k]={kind:'review',ckey:k,status:'passed',by:who(),at:new Date().toISOString().slice(0,10)};post(REV[k]);closeAssign();applyAll();});
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.rvbtn');if(!b)return;e.preventDefault();e.stopPropagation();var id=b.getAttribute('data-rid');var cur=(REV[id]&&(REV[id].status||REV[id].considered))||'';var nxt=cur===''?'considered':((cur==='considered'||cur==='yes')?'passed':'');if(nxt===''){delete REV[id];post({kind:'review',ckey:id,remove:true});}else{var st=b.parentNode.querySelector('.star');var m=st?meta(st):{ckey:id};m.kind='review';m.status=nxt;m.by=who();m.at=new Date().toISOString().slice(0,10);REV[id]=m;post(m);}applyAll();});
 var up=(location.pathname.indexOf('/versions/')>-1||location.pathname.indexOf('/monthly/')>-1)?'../../':'';
+document.querySelectorAll('.tabnav a[data-h]').forEach(function(a){a.setAttribute('href',up+a.getAttribute('data-h'));});
 var sb=document.getElementById('savedbtn');if(sb)sb.setAttribute('href',up+'shortlist.html');
 var rb0=document.getElementById('reviewbtn');if(rb0)rb0.setAttribute('href',up+'review.html');
 loadAll();
