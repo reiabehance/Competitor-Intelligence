@@ -8,12 +8,6 @@ on:
       passphrase:
         description: 'Run passphrase (must match the RUN_PASSPHRASE secret). Manual runs cost Apify money.'
         required: true
-  push:
-    branches: [ main ]
-    paths:
-      - '*.py'
-      - '*.json'
-      - '.github/workflows/**'
 
 permissions:
   contents: write

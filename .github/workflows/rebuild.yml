@@ -1,0 +1,55 @@
+name: Réia Rebuild site (no scrape, free)
+
+on:
+  workflow_dispatch:        # manual button — rebuilds from the LAST scrape's data, no Apify cost
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: reia-intel
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Rebuild from last scrape (classify -> render -> build -> freeze, NO Apify)
+        env:
+          REPO_ROOT: ${{ github.workspace }}
+          REIA_NO_SCRAPE: '1'
+        run: python pipeline.py
+
+      - name: Commit rebuilt data + site
+        run: |
+          git config user.name "reia-intel-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data share
+          git commit -m "Rebuild (no scrape) — $(date -u +%Y-%m-%d)" || echo "nothing to commit"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main || true
+            if git push; then echo "pushed"; break; fi
+            echo "push retry $i ..."; sleep 5
+          done
+
+      - name: Upload site (share/) for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: share
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
