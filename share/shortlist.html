@@ -137,6 +137,7 @@ function card(x){
     '<div class="r3"><div class="fld"><label>Campaign / folder</label><select class="campaign"><option value="">— none —</option>'+campList().map(function(n){return '<option'+((x.campaign||"")===n?' selected':'')+'>'+esc(n)+'</option>';}).join("")+((x.campaign&&campList().indexOf(x.campaign)<0)?('<option selected>'+esc(x.campaign)+'</option>'):'')+'</select></div>'+
       '<div class="fld"><label>Designer</label><select class="designer">'+dzo()+'</select></div>'+
       '<div class="fld"><label>Priority</label><select class="priority">'+pro()+'</select></div></div>'+
+    '<div class="r2"><div class="fld"><label>📅 Submission due date '+(((x.priority||"")==="Urgent"||(x.priority||"")==="High")?'(needed for priority work)':'')+'</label><input type="date" class="due_date" value="'+esc(x.due_date||"")+'"></div><div class="fld"></div></div>'+
     '<div class="r2"><div class="fld"><label>🎯 Objective — what we want to achieve</label><textarea class="objective">'+esc(x.objective)+'</textarea></div>'+
       '<div class="fld"><label>🎬 Creative direction — what to make</label><textarea class="reason">'+esc(x.reason)+'</textarea></div></div>'+
     '<div class="r2"><div class="fld"><label>✍️ Caption</label><textarea class="caption">'+esc(x.caption)+'</textarea></div>'+
@@ -149,7 +150,7 @@ function card(x){
       '<input type="file" accept="image/*" class="upfile" hidden></div></div>';
 }
 function collect(c){var o=DATA[c.getAttribute("data-k")]||{ckey:c.getAttribute("data-k")};
-  ["campaign","designer","priority","replicated","objective","reason","caption","copy","feedback"].forEach(function(f){var el=c.querySelector("."+f);if(el)o[f]=el.value;});
+  ["campaign","designer","priority","due_date","replicated","objective","reason","caption","copy","feedback"].forEach(function(f){var el=c.querySelector("."+f);if(el)o[f]=el.value;});
   o.kind="shortlist";o.ckey=c.getAttribute("data-k");o.by=o.by||nm();DATA[o.ckey]=o;return o;}
 function post(o,btn){if(btn)btn.textContent="Saving…";
   return fetch(BACKEND,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)}).then(function(r){return r.json();})

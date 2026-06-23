@@ -92,15 +92,19 @@ function renderChips(){
   document.querySelectorAll(".pchip").forEach(function(c){c.addEventListener("click",function(){WHO=c.getAttribute("data-n");history.replaceState(null,"","?d="+encodeURIComponent(WHO));renderChips();render();});});
 }
 function mine(){return Object.keys(DATA).map(function(k){return DATA[k];}).filter(function(x){return dzOf(x)===WHO;});}
+function duePill(x){var d=(x.due_date||"").toString().trim();if(!d)return '';var t=new Date(d+"T00:00:00"),n=new Date();n.setHours(0,0,0,0);var done=(x.replicated||"")==="done";var cls=done?"st-done":(t<n?"st-block":(t.getTime()===n.getTime()?"st-work":"st-todo"));return '<span class="pill '+cls+'">📅 '+(!done&&t<n?"OVERDUE ":"due ")+esc(d)+'</span>';}
 function render(){
-  var items=mine();
-  var c={no:0,"in-progress":0,blocked:0,done:0};items.forEach(function(x){c[x.replicated||"no"]=(c[x.replicated||"no"]||0)+1;});
-  document.getElementById("kpis").innerHTML=kpi("tot",items.length,"Assigned to "+esc(WHO))+kpi("",c.no||0,"To replicate")+kpi("work",c["in-progress"]||0,"Working")+kpi("block",c.blocked||0,"Blocked")+kpi("done",c.done||0,"Done");
-  items.sort(function(p,q){return prRank(p.priority)-prRank(q.priority)||(p.brand||"").localeCompare(q.brand||"");});
+  var all=mine();
+  var c={no:0,"in-progress":0,blocked:0,done:0};all.forEach(function(x){c[x.replicated||"no"]=(c[x.replicated||"no"]||0)+1;});
+  document.getElementById("kpis").innerHTML=kpi("tot",all.length,"Assigned to "+esc(WHO))+kpi("",c.no||0,"To replicate")+kpi("work",c["in-progress"]||0,"Working")+kpi("block",c.blocked||0,"Blocked")+kpi("done",c.done||0,"Done · archived");
+  var active=all.filter(function(x){return (x.replicated||"no")!=="done";}).sort(function(p,q){return prRank(p.priority)-prRank(q.priority)||(p.brand||"").localeCompare(q.brand||"");});
+  var done=all.filter(function(x){return (x.replicated||"no")==="done";}).sort(function(p,q){return (q.at||"").localeCompare(p.at||"");});
   var L=document.getElementById("list");
-  if(!items.length){L.innerHTML='<div class="empty">Nothing assigned to '+esc(WHO)+' yet. New work is assigned from the To-Review or Board tab.</div>';return;}
+  if(!all.length){L.innerHTML='<div class="empty">Nothing assigned to '+esc(WHO)+' yet. New work is assigned from the To-Review or Board tab.</div>';return;}
   var html="",curp=null;
-  items.forEach(function(x){var p=x.priority||"Normal";if(p!==curp){curp=p;html+='<div class="grp">'+esc(p)+' priority</div>';}html+=card(x);});
+  active.forEach(function(x){var p=x.priority||"Normal";if(p!==curp){curp=p;html+='<div class="grp">'+esc(p)+' priority</div>';}html+=card(x);});
+  if(!active.length)html+='<div class="empty">No pending work — all caught up ✓</div>';
+  if(done.length){html+='<div class="grp">📦 Completed &amp; archived <span style="font-family:Poppins,sans-serif;font-size:.6rem;color:#8a7c6c">('+done.length+')</span></div>';done.forEach(function(x){html+=card(x);});}
   L.innerHTML=html;bind();
 }
 function kpi(cls,n,l){return '<div class="kpi '+cls+'"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
@@ -126,7 +130,7 @@ function card(x){
   return '<div class="card" data-k="'+esc(x.ckey)+'">'+
     '<div class="hd">'+th+'<b>'+esc(x.brand)+'</b><span class="pill '+(isReel(x)?"mb-r":"mb-s")+'">'+(isReel(x)?"REEL":"STATIC")+'</span>'+
       '<span class="pill cat">'+esc(x.cat)+'</span><span class="pill '+sm[2]+'">'+sm[1]+'</span>'+
-      '<span class="pill pr-'+((x.priority||"Normal").toLowerCase())+'">'+esc(x.priority||"Normal")+'</span>'+
+      '<span class="pill pr-'+((x.priority||"Normal").toLowerCase())+'">'+esc(x.priority||"Normal")+'</span>'+duePill(x)+
       (x.campaign?'<span class="pill" style="background:#b78b2e">🏷 '+esc(x.campaign)+'</span>':'')+
       '<a style="margin-left:auto;font-family:Poppins;font-size:.66rem;color:#2f4d7a;text-decoration:none" href="'+esc(x.link)+'" target="_blank" rel="noopener">original ↗</a></div>'+
     '<div class="brief">'+bbox("🎯 Objective",x.objective)+bbox("🎬 Creative direction",x.reason)+bbox("✍️ Caption",x.caption,true)+bbox("🅰️ On-creative copy",x.copy,true)+'</div>'+
@@ -153,4 +157,4 @@ load();
 setInterval(load,30000);
 </script>
 </body></html>
-<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->
+<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->

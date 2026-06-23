@@ -65,6 +65,7 @@ function campOf(x){return (x.campaign&&(""+x.campaign).trim())?(""+x.campaign).t
 function dzOf(x){return (x.designer&&(""+x.designer).trim())?(""+x.designer).trim():"Unassigned";}
 function stg(r){r=r||"no";return r==="done"?'<span class="pill st-done">Replicated ✓</span>':(r==="in-progress"?'<span class="pill st-work">Replicating</span>':(r==="blocked"?'<span class="pill st-block">Not working</span>':'<span class="pill st-todo">To replicate</span>'));}
 function pr(p){p=p||"Normal";return '<span class="pill pr-'+p.toLowerCase()+'">'+esc(p)+'</span>';}
+function duePill(x){var d=(x.due_date||"").toString().trim();if(!d)return '<span class="muted">—</span>';var t=new Date(d+"T00:00:00"),n=new Date();n.setHours(0,0,0,0);var done=(x.replicated||"")==="done";var cls=done?"st-done":(t<n?"st-block":(t.getTime()===n.getTime()?"st-work":"st-todo"));return '<span class="pill '+cls+'">'+(!done&&t<n?"⚠ ":"")+esc(d)+'</span>';}
 function passFilter(x){var r=x.replicated||"no";if(FILTER==="todo")return r!=="done";if(FILTER==="all")return true;return r===FILTER;}
 function prRank(p){var i=PRIOS.indexOf(p||"Normal");return i<0?2:i;}
 function selected(){
@@ -90,14 +91,15 @@ function render(){
     if(g!==curg){ if(curg!==null)html+='</tbody></table>'; curg=g;
       var cnt=items.filter(function(y){return gf(y)===g;}).length;
       html+='<div class="grp">'+(GROUP==="designer"?'🧑‍🎨 ':'🏷 ')+esc(g)+' <span class="gn">'+cnt+'</span></div>';
-      html+='<table><thead><tr><th>Ref</th><th>Brand</th><th>Type</th><th>Designer</th><th>Priority</th><th>Stage</th><th>What to replicate</th><th>How we\'ll use it</th><th>Links</th></tr></thead><tbody>';
+      html+='<table><thead><tr><th>Ref</th><th>Brand</th><th>Type</th><th>Campaign</th><th>Designer</th><th>Priority</th><th>Due</th><th>Stage</th><th>What to replicate</th><th>How we\'ll use it</th><th>Links</th></tr></thead><tbody>';
     }
     var th=x.img?('<img class="thumb" src="'+esc(x.img)+'" referrerpolicy="no-referrer">'):'<div class="nothumb"></div>';
     var our=x.our_creative?(' · <a class="lnk" href="'+esc(x.our_creative)+'" target="_blank" rel="noopener">our asset ↗</a>'):'';
     html+='<tr><td>'+th+'</td><td><span class="brand">'+esc(x.brand)+'</span><br><span class="muted" style="font-size:.6rem">'+esc(x.cat)+'</span></td>'+
       '<td>'+(isReel(x)?'<span class="mb mb-r">REEL</span>':'<span class="mb mb-s">STATIC</span>')+'</td>'+
+      '<td class="dz">'+esc(campOf(x))+'</td>'+
       '<td class="dz">'+esc(dzOf(x)==="Unassigned"?"—":dzOf(x))+'</td>'+
-      '<td>'+pr(x.priority)+'</td><td>'+stg(x.replicated)+'</td>'+
+      '<td>'+pr(x.priority)+'</td><td>'+duePill(x)+'</td><td>'+stg(x.replicated)+'</td>'+
       '<td class="bd">'+(esc(x.reason)||'<span class="muted">—</span>')+'</td>'+
       '<td class="use">'+(esc(x.usage)||'<span class="muted">—</span>')+'</td>'+
       '<td><a class="lnk" href="'+esc(x.link)+'" target="_blank" rel="noopener">original ↗</a>'+our+'</td></tr>';
@@ -108,9 +110,9 @@ function cc(s){s=(s==null?"":""+s);return '"'+s.replace(/"/g,'""').replace(/\r?\
 function dlOf(x,slot){var a={};try{a=JSON.parse(x.assets||"{}");}catch(e){a={};}var v=a[slot];if(!v)return"";return /^https?:/.test(v)?v:("https://drive.google.com/uc?export=download&id="+v);}
 function downloadCSV(){
   var items=selected();
-  var head=["Campaign","Brand","Type","Designer","Priority","Stage","Objective","Caption","On-creative copy","Creative direction","How we'll use it","Original ad URL","1:1","4:5","9:16","Reel/Video","Feedback","By","Updated"];
+  var head=["Campaign","Brand","Type","Designer","Priority","Due date","Stage","Objective","Caption","On-creative copy","Creative direction","How we'll use it","Original ad URL","1:1","4:5","9:16","Reel/Video","Feedback","By","Updated"];
   var rows=[head.map(cc).join(",")];
-  items.forEach(function(x){rows.push([campOf(x),x.brand,(isReel(x)?"Reel":"Static"),dzOf(x),(x.priority||"Normal"),
+  items.forEach(function(x){rows.push([campOf(x),x.brand,(isReel(x)?"Reel":"Static"),dzOf(x),(x.priority||"Normal"),(x.due_date||""),
     ((x.replicated||"no")==="done"?"Replicated":(x.replicated==="in-progress"?"Replicating":(x.replicated==="blocked"?"Not working":"To replicate"))),
     x.objective,x.caption,x.copy,x.reason,x.usage,x.link,dlOf(x,"sq"),dlOf(x,"portrait"),dlOf(x,"story"),dlOf(x,"reel"),x.feedback,(x.by||""),(x.at||"")].map(cc).join(","));});
   var blob=new Blob(["﻿"+rows.join("\r\n")],{type:"text/csv;charset=utf-8;"});
@@ -126,4 +128,4 @@ document.getElementById("print").addEventListener("click",function(){window.prin
 load();
 </script>
 </body></html>
-<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->
+<!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard --><!-- tail-guard -->
