@@ -1,5 +1,17 @@
 [
   {
+    "stamp": "2026-07-06_1016",
+    "nice": "06 Jul 2026, 10:16",
+    "ym": "2026-07",
+    "monthname": "July 2026",
+    "has_brief": false,
+    "unique": 6564,
+    "brands": 52,
+    "winning": 3839,
+    "losing": 1311,
+    "newly": 1414
+  },
+  {
     "stamp": "2026-07-01_0945",
     "nice": "01 Jul 2026, 09:45",
     "ym": "2026-07",
